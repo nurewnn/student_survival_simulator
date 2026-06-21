@@ -283,7 +283,7 @@
 
                     <div class="flex justify-between items-center w-full z-10 p-5 font-mono-custom">
                         <span class="text-[9px] bg-[#010828]/90 text-cream font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-white/10">
-                            Companion Stream
+                            Roommate Stream
                         </span>
                         <div class="flex items-center gap-1.5 bg-[#010828]/60 px-2 py-0.5 rounded-full border border-white/5">
                             <span class="w-2 h-2 rounded-full bg-neon animate-ping"></span>
@@ -293,7 +293,7 @@
                     
                     <!-- Text Overlay Dialogue Panel at the bottom (Allows full view of the video backdrop) -->
                     <div class="bg-[#010828]/85 p-5 rounded-b-[32px] border-t border-white/10 z-10 font-mono-custom">
-                        <span class="text-[9px] text-neon font-bold uppercase tracking-wider block">Companion Comments:</span>
+                        <span class="text-[9px] text-neon font-bold uppercase tracking-wider block">Roommate's Verdict:</span>
                         <p id="dialogue-box" class="text-xs text-cream mt-1.5 italic font-semibold leading-relaxed">
                             "We are surviving, barely."
                         </p>
@@ -1295,7 +1295,7 @@
             const dialogue = document.getElementById('dialogue-box');
             
             // Only overwrite dialogue if not waiting for Gen-Z AI commentary response
-            if (!dialogue.innerHTML.includes('Companion is typing...')) {
+            if (!dialogue.innerHTML.includes('Roomie is typing...')) {
                 if (results.status === 'Thriving') {
                     dialogue.innerText = '"Easiest semester of my life, chat."';
                 } else if (results.status === 'Hanging In There') {
@@ -1731,7 +1731,7 @@
                     <div class="flex items-start gap-2.5">
                         <i class="fa-solid fa-comments text-pink-400 mt-0.5 text-xs"></i>
                         <div>
-                            <strong class="text-pink-400 block text-[9px] uppercase font-bold tracking-wider">Mum's WhatsApp Voice:</strong>
+                            <strong class="text-pink-400 block text-[9px] uppercase font-bold tracking-wider">Mum's Dramatic WhatsApp:</strong>
                             <span class="text-cream/90 text-[11px] leading-relaxed italic">"${result.text.replace(/"/g, '').trim()}"</span>
                         </div>
                     </div>
