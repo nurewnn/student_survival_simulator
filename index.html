@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,16 +28,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Condiment&display=swap" rel="stylesheet">
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         /* FONTS ALIASES */
         .font-grotesk {
             font-family: 'Anton', sans-serif;
             letter-spacing: 0.05em;
         }
+
         .font-condiment {
             font-family: 'Condiment', cursive;
         }
+
         .font-mono-custom {
             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
         }
@@ -61,7 +64,7 @@
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 
+            box-shadow:
                 inset 0 1px 1px rgba(255, 255, 255, 0.2),
                 0 10px 30px rgba(0, 0, 0, 0.5);
             position: relative;
@@ -71,7 +74,7 @@
 
         .liquid-glass:hover {
             border-color: rgba(111, 255, 0, 0.3);
-            box-shadow: 
+            box-shadow:
                 inset 0 1px 2px rgba(255, 255, 255, 0.3),
                 0 0 20px rgba(111, 255, 0, 0.1),
                 0 15px 40px rgba(0, 0, 0, 0.6);
@@ -97,6 +100,7 @@
             z-index: -10;
             opacity: 0.15;
         }
+
         .bg-video {
             width: 100%;
             height: 100%;
@@ -136,13 +140,16 @@
         ::-webkit-scrollbar {
             width: 6px;
         }
+
         ::-webkit-scrollbar-track {
             background: rgba(1, 8, 40, 0.5);
         }
+
         ::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 9999px;
         }
+
         ::-webkit-scrollbar-thumb:hover {
             background: var(--color-neon);
         }
@@ -153,6 +160,7 @@
             border: 2px solid rgba(255, 255, 255, 0.15);
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
         .choice-btn:hover {
             background: rgba(111, 255, 0, 0.08);
             border-color: var(--color-neon);
@@ -161,6 +169,7 @@
         }
     </style>
 </head>
+
 <body class="font-mono-custom selection:bg-neon selection:text-black">
 
     <!-- Texture Overlay -->
@@ -169,17 +178,22 @@
     <!-- Background Cosmic Video Loop -->
     <div class="bg-video-container">
         <video class="bg-video" autoplay loop muted playsinline>
-            <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_045634_e1c98c76-1265-4f5c-882a-4276f2080894.mp4" type="video/mp4">
+            <source
+                src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_045634_e1c98c76-1265-4f5c-882a-4276f2080894.mp4"
+                type="video/mp4">
         </video>
     </div>
 
     <!-- SECTION 1: WELCOME SCREEN (Full Viewport Landing Page) -->
-    <section id="welcome-screen" class="relative min-h-screen flex flex-col justify-between p-6 md:p-12 z-20 transition-all duration-700 bg-[#010828]/40">
-        
+    <section id="welcome-screen"
+        class="relative min-h-screen flex flex-col justify-between p-6 md:p-12 z-20 transition-all duration-700 bg-[#010828]/40">
+
         <!-- Welcome Screen Video Background -->
         <div class="absolute inset-0 z-0">
             <video class="w-full h-full object-cover" autoplay loop muted playsinline>
-                <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_045634_e1c98c76-1265-4f5c-882a-4276f2080894.mp4" type="video/mp4">
+                <source
+                    src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_045634_e1c98c76-1265-4f5c-882a-4276f2080894.mp4"
+                    type="video/mp4">
             </video>
             <div class="absolute inset-0 bg-gradient-to-t from-[#010828] via-transparent to-[#010828]/50"></div>
         </div>
@@ -187,7 +201,8 @@
         <!-- Header Row -->
         <div class="z-10 flex justify-between items-center max-w-[1831px] w-full mx-auto font-mono-custom">
             <span class="text-xl font-grotesk tracking-widest text-cream uppercase">Orbis.Fuzzy</span>
-            <button onclick="toggleDocModal(true)" class="text-xs font-mono-custom text-neon uppercase tracking-widest hover:underline">
+            <button onclick="toggleDocModal(true)"
+                class="text-xs font-mono-custom text-neon uppercase tracking-widest hover:underline">
                 View Project Docs
             </button>
         </div>
@@ -195,70 +210,84 @@
         <!-- Center Landing Title -->
         <div class="z-10 text-center max-w-3xl mx-auto my-auto space-y-6">
             <div class="relative inline-block">
-                <h2 class="text-5xl sm:text-7xl md:text-8xl font-grotesk text-cream uppercase leading-none tracking-tight">
+                <h2
+                    class="text-5xl sm:text-7xl md:text-8xl font-grotesk text-cream uppercase leading-none tracking-tight">
                     How Cooked<br>Are You?
                 </h2>
                 <!-- Cursive overlay -->
-                <span class="text-3xl sm:text-5xl font-condiment text-neon absolute -right-6 -bottom-6 transform -rotate-6 select-none">
+                <span
+                    class="text-3xl sm:text-5xl font-condiment text-neon absolute -right-6 -bottom-6 transform -rotate-6 select-none">
                     survival simulator
                 </span>
             </div>
 
-            <p class="text-xs sm:text-sm text-cream/70 leading-relaxed max-w-xl mx-auto uppercase tracking-wide pt-4 font-mono-custom">
-                A 14-week Malaysian university semester simulator driven by a mathematical Mamdani Fuzzy Inference Engine.
+            <p
+                class="text-xs sm:text-sm text-cream/70 leading-relaxed max-w-xl mx-auto uppercase tracking-wide pt-4 font-mono-custom">
+                A 14-week Malaysian university semester simulator driven by a mathematical Mamdani Fuzzy Inference
+                Engine.
             </p>
 
             <div class="pt-6">
-                <button onclick="enterDashboard()" class="px-8 py-4 text-sm font-grotesk rounded-full text-cream liquid-glass tracking-wider uppercase hover:bg-neon hover:text-black">
+                <button onclick="enterDashboard()"
+                    class="px-8 py-4 text-sm font-grotesk rounded-full text-cream liquid-glass tracking-wider uppercase hover:bg-neon hover:text-black">
                     Start Semester
                 </button>
             </div>
         </div>
 
         <!-- Footer Info -->
-        <div class="z-10 flex flex-col md:flex-row justify-between items-center max-w-[1831px] w-full mx-auto text-[10px] text-cream/40 tracking-widest uppercase gap-2 font-mono-custom">
+        <div
+            class="z-10 flex flex-col md:flex-row justify-between items-center max-w-[1831px] w-full mx-auto text-[10px] text-cream/40 tracking-widest uppercase gap-2 font-mono-custom">
             <span>Powered by Mamdani FLC</span>
             <span>© 2026 Orbis.Fuzzy. All Rights Reserved.</span>
         </div>
     </section>
 
     <!-- SECTION 2: THE GAME PLAY DASHBOARD (Hidden initially) -->
-    <main id="game-dashboard" class="max-w-[1831px] mx-auto p-4 md:p-8 space-y-6 hidden opacity-0 transition-opacity duration-700">
-        
+    <main id="game-dashboard"
+        class="max-w-[1831px] mx-auto p-4 md:p-8 space-y-6 hidden opacity-0 transition-opacity duration-700">
+
         <!-- HEADER -->
-        <header class="flex flex-col md:flex-row justify-between items-start md:items-center p-6 liquid-glass rounded-[28px] gap-4">
+        <header
+            class="flex flex-col md:flex-row justify-between items-start md:items-center p-6 liquid-glass rounded-[28px] gap-4">
             <div>
                 <h1 class="text-3xl font-grotesk text-cream tracking-wider uppercase">
                     How Cooked Are You?
                 </h1>
                 <div class="relative inline-block mt-0.5">
-                    <span class="text-xs font-condiment text-neon text-lg lowercase">A fuzzy student survival system</span>
+                    <span class="text-xs font-condiment text-neon text-lg lowercase">A fuzzy student survival
+                        system</span>
                 </div>
             </div>
-            
+
             <div class="flex items-center gap-6 font-mono-custom">
                 <!-- Status Badge -->
                 <div class="px-5 py-3 rounded-[20px] liquid-glass text-center min-w-[150px]">
-                    <span class="text-[9px] text-cream/60 font-bold uppercase tracking-wider block">Survival state</span>
+                    <span class="text-[9px] text-cream/60 font-bold uppercase tracking-wider block">Survival
+                        state</span>
                     <span id="status-badge" class="text-lg font-grotesk text-neon tracking-wide uppercase">Cooked</span>
                 </div>
                 <!-- Centroid Display -->
                 <div class="px-5 py-3 rounded-[20px] liquid-glass text-center min-w-[120px]">
                     <span class="text-[9px] text-cream/60 font-bold uppercase tracking-wider block">Centroid</span>
-                    <span id="centroid-display" class="text-lg font-grotesk text-cream tracking-wide font-mono-custom">50.00</span>
+                    <span id="centroid-display"
+                        class="text-lg font-grotesk text-cream tracking-wide font-mono-custom">50.00</span>
                 </div>
-                
+
                 <div class="flex gap-2">
                     <!-- Mini Games button -->
-                    <button onclick="openMiniGamesHub()" class="px-4 py-3 rounded-[20px] liquid-glass text-neon hover:text-neon/80 text-xs font-grotesk uppercase">
+                    <button onclick="openMiniGamesHub()"
+                        class="px-4 py-3 rounded-[20px] liquid-glass text-neon hover:text-neon/80 text-xs font-grotesk uppercase">
                         <i class="fa-solid fa-gamepad mr-2"></i>Mini Games
                     </button>
                     <!-- Documentation button -->
-                    <button onclick="toggleDocModal(true)" class="px-4 py-3 rounded-[20px] liquid-glass text-cream/60 hover:text-neon text-xs font-grotesk uppercase">
+                    <button onclick="toggleDocModal(true)"
+                        class="px-4 py-3 rounded-[20px] liquid-glass text-cream/60 hover:text-neon text-xs font-grotesk uppercase">
                         <i class="fa-solid fa-file-lines mr-2"></i>Docs
                     </button>
                     <!-- Back to Welcome button -->
-                    <button onclick="exitToWelcome()" class="p-3 rounded-full liquid-glass text-cream/60 hover:text-neon text-xs">
+                    <button onclick="exitToWelcome()"
+                        class="p-3 rounded-full liquid-glass text-cream/60 hover:text-neon text-xs">
                         <i class="fa-solid fa-house"></i>
                     </button>
                 </div>
@@ -267,33 +296,39 @@
 
         <!-- MAIN LAYOUT -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            
+
             <!-- LEFT COLUMN: THE PLAY ZONE (5 Cols) -->
             <div class="lg:col-span-5 space-y-6">
-                
+
                 <!-- CHARACTER CARD (Clean cinematic display without overlapping avatar emoji) -->
-                <div class="liquid-glass rounded-[32px] min-h-[20rem] h-auto flex flex-col justify-between relative overflow-hidden">
-                    
+                <div
+                    class="liquid-glass rounded-[32px] min-h-[20rem] h-auto flex flex-col justify-between relative overflow-hidden">
+
                     <!-- Loop Video Backdrop inside Card -->
                     <div class="absolute inset-0 z-0">
                         <video class="w-full h-full object-cover" autoplay loop muted playsinline>
-                            <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_151551_992053d1-3d3e-4b8c-abac-45f22158f411.mp4" type="video/mp4">
+                            <source
+                                src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_151551_992053d1-3d3e-4b8c-abac-45f22158f411.mp4"
+                                type="video/mp4">
                         </video>
                     </div>
 
                     <div class="flex justify-between items-center w-full z-10 p-5 font-mono-custom">
-                        <span class="text-[9px] bg-[#010828]/90 text-cream font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-white/10">
+                        <span
+                            class="text-[9px] bg-[#010828]/90 text-cream font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-white/10">
                             Roommate Stream
                         </span>
-                        <div class="flex items-center gap-1.5 bg-[#010828]/60 px-2 py-0.5 rounded-full border border-white/5">
+                        <div
+                            class="flex items-center gap-1.5 bg-[#010828]/60 px-2 py-0.5 rounded-full border border-white/5">
                             <span class="w-2 h-2 rounded-full bg-neon animate-ping"></span>
                             <span class="text-[8px] text-cream/80">LIVE</span>
                         </div>
                     </div>
-                    
+
                     <!-- Text Overlay Dialogue Panel at the bottom (Allows full view of the video backdrop) -->
                     <div class="bg-[#010828]/85 p-5 rounded-b-[32px] border-t border-white/10 z-10 font-mono-custom">
-                        <span class="text-[9px] text-neon font-bold uppercase tracking-wider block">Roommate's Verdict:</span>
+                        <span class="text-[9px] text-neon font-bold uppercase tracking-wider block">Roommate's
+                            Verdict:</span>
                         <p id="dialogue-box" class="text-xs text-cream mt-1.5 italic font-semibold leading-relaxed">
                             "We are surviving, barely."
                         </p>
@@ -304,26 +339,33 @@
                 <div class="liquid-glass rounded-[32px] p-6 space-y-4">
                     <div class="flex justify-between items-center font-mono-custom">
                         <h2 class="text-xs font-grotesk text-cream/70 uppercase tracking-widest">Semester Timeline</h2>
-                        <span id="stage-badge" class="text-xs bg-neon/10 text-neon font-bold px-3 py-1 rounded-full border border-neon/20 uppercase tracking-wider font-mono-custom">
+                        <span id="stage-badge"
+                            class="text-xs bg-neon/10 text-neon font-bold px-3 py-1 rounded-full border border-neon/20 uppercase tracking-wider font-mono-custom">
                             Week 1
                         </span>
                     </div>
-                    
+
                     <!-- Progress Bar (Represents 14 weeks) -->
                     <div class="w-full bg-[#010828] h-3 rounded-full overflow-hidden border border-white/10 p-[1px]">
-                        <div id="timeline-progress" class="bg-gradient-to-r from-neon via-yellow-400 to-red-500 h-full rounded-full transition-all duration-500" style="width: 7.14%"></div>
+                        <div id="timeline-progress"
+                            class="bg-gradient-to-r from-neon via-yellow-400 to-red-500 h-full rounded-full transition-all duration-500"
+                            style="width: 7.14%"></div>
                     </div>
 
                     <!-- Choice Event Box -->
                     <div id="choice-card" class="bg-[#010828]/40 border border-white/5 rounded-[24px] p-5 space-y-4">
-                        <h3 id="event-title" class="text-sm font-grotesk text-neon tracking-wide uppercase">Friends Invite You to Zus</h3>
-                        <p id="event-text" class="text-xs text-cream/70 leading-relaxed font-mono-custom">"I literally said I’m saving money this month… but that Matcha Latte looking kinda convincing."</p>
-                        
+                        <h3 id="event-title" class="text-sm font-grotesk text-neon tracking-wide uppercase">Friends
+                            Invite You to Zus</h3>
+                        <p id="event-text" class="text-xs text-cream/70 leading-relaxed font-mono-custom">"I literally
+                            said I’m saving money this month… but that Matcha Latte looking kinda convincing."</p>
+
                         <div class="grid grid-cols-2 gap-3 pt-1">
-                            <button id="choice-1-btn" onclick="makeChoice(1)" class="choice-btn px-4 py-3 text-xs font-grotesk rounded-xl text-cream uppercase">
+                            <button id="choice-1-btn" onclick="makeChoice(1)"
+                                class="choice-btn px-4 py-3 text-xs font-grotesk rounded-xl text-cream uppercase">
                                 Choice 1
                             </button>
-                            <button id="choice-2-btn" onclick="makeChoice(2)" class="choice-btn px-4 py-3 text-xs font-grotesk rounded-xl text-cream/60 uppercase">
+                            <button id="choice-2-btn" onclick="makeChoice(2)"
+                                class="choice-btn px-4 py-3 text-xs font-grotesk rounded-xl text-cream/60 uppercase">
                                 Choice 2
                             </button>
                         </div>
@@ -333,7 +375,7 @@
                 <!-- CRISP VARIABLE CONTROLS -->
                 <div class="liquid-glass rounded-[32px] p-6 space-y-5">
                     <h2 class="text-xs font-grotesk text-cream/70 uppercase tracking-widest">Variable Adjuster</h2>
-                    
+
                     <!-- Assignment Load -->
                     <div class="space-y-2">
                         <div class="flex justify-between items-center text-xs">
@@ -380,7 +422,8 @@
 
                     <!-- Mini Games managed at header bar -->
 
-                    <button onclick="resetGame()" class="w-full py-3 bg-[#010828]/60 hover:bg-white/10 border border-white/10 text-[10px] font-grotesk rounded-xl transition-all uppercase tracking-widest text-cream/70 hover:text-neon">
+                    <button onclick="resetGame()"
+                        class="w-full py-3 bg-[#010828]/60 hover:bg-white/10 border border-white/10 text-[10px] font-grotesk rounded-xl transition-all uppercase tracking-widest text-cream/70 hover:text-neon">
                         Reset State variables
                     </button>
                 </div>
@@ -388,26 +431,34 @@
 
             <!-- RIGHT COLUMN: ANALYTICS HUB (7 Cols) -->
             <div class="lg:col-span-7 space-y-6">
-                
+
                 <!-- FUZZIFICATION INPUT CHARTS -->
                 <div class="liquid-glass rounded-[32px] p-6">
-                    <h2 class="text-xs font-grotesk text-cream/70 uppercase tracking-widest mb-4 font-mono-custom">Linguistic Fuzzification Scopes</h2>
-                    
+                    <h2 class="text-xs font-grotesk text-cream/70 uppercase tracking-widest mb-4 font-mono-custom">
+                        Linguistic Fuzzification Scopes</h2>
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="bg-[#010828]/60 p-3.5 rounded-[24px] border border-white/10">
-                            <span class="text-[9px] text-neon font-bold uppercase tracking-wider font-mono-custom">Assignment Load Sets</span>
+                            <span
+                                class="text-[9px] text-neon font-bold uppercase tracking-wider font-mono-custom">Assignment
+                                Load Sets</span>
                             <canvas id="canvas-assignment" class="w-full h-24 mt-2"></canvas>
                         </div>
                         <div class="bg-[#010828]/60 p-3.5 rounded-[24px] border border-white/10">
-                            <span class="text-[9px] text-neon font-bold uppercase tracking-wider font-mono-custom">Sleep Hour Sets</span>
+                            <span class="text-[9px] text-neon font-bold uppercase tracking-wider font-mono-custom">Sleep
+                                Hour Sets</span>
                             <canvas id="canvas-sleep" class="w-full h-24 mt-2"></canvas>
                         </div>
                         <div class="bg-[#010828]/60 p-3.5 rounded-[24px] border border-white/10">
-                            <span class="text-[9px] text-neon font-bold uppercase tracking-wider font-mono-custom">Wallet Balance Sets</span>
+                            <span
+                                class="text-[9px] text-neon font-bold uppercase tracking-wider font-mono-custom">Wallet
+                                Balance Sets</span>
                             <canvas id="canvas-wallet" class="w-full h-24 mt-2"></canvas>
                         </div>
                         <div class="bg-[#010828]/60 p-3.5 rounded-[24px] border border-white/10">
-                            <span class="text-[9px] text-neon font-bold uppercase tracking-wider font-mono-custom">Stress Level Sets</span>
+                            <span
+                                class="text-[9px] text-neon font-bold uppercase tracking-wider font-mono-custom">Stress
+                                Level Sets</span>
                             <canvas id="canvas-stress" class="w-full h-24 mt-2"></canvas>
                         </div>
                     </div>
@@ -415,16 +466,20 @@
 
                 <!-- DEFUZZIFICATION OUTPUT CHART -->
                 <div class="liquid-glass rounded-[32px] p-6">
-                    <h2 class="text-xs font-grotesk text-cream/70 uppercase tracking-widest mb-4">Aggregation & Defuzzification</h2>
+                    <h2 class="text-xs font-grotesk text-cream/70 uppercase tracking-widest mb-4">Aggregation &
+                        Defuzzification</h2>
                     <div class="bg-[#010828]/60 p-4 rounded-[24px] border border-white/10">
-                        <span class="text-[9px] text-cream/60 font-bold uppercase tracking-wider font-mono-custom">Aggregated Output Curve [Union of Clipped Rules]</span>
+                        <span
+                            class="text-[9px] text-cream/60 font-bold uppercase tracking-wider font-mono-custom">Aggregated
+                            Output Curve [Union of Clipped Rules]</span>
                         <canvas id="canvas-defuzz" class="w-full h-48 mt-2"></canvas>
                     </div>
                 </div>
 
                 <!-- ACTIVE RULES -->
                 <div class="liquid-glass rounded-[32px] p-6">
-                    <h2 class="text-xs font-grotesk text-cream/70 uppercase tracking-widest mb-4 font-mono-custom">Firing Rules Engine</h2>
+                    <h2 class="text-xs font-grotesk text-cream/70 uppercase tracking-widest mb-4 font-mono-custom">
+                        Firing Rules Engine</h2>
                     <div id="rules-box" class="space-y-2.5 max-h-52 overflow-y-auto pr-2 text-[10px] font-mono-custom">
                         <!-- Rules list injected here -->
                     </div>
@@ -437,29 +492,37 @@
     </main>
 
     <!-- SECTION 3: INTERACTIVE DOCUMENTATION OVERLAY -->
-    <div id="doc-modal" class="fixed inset-0 z-40 bg-[#010828]/95 backdrop-blur-xl hidden flex items-center justify-center p-4 overflow-y-auto">
-        <div class="liquid-glass rounded-[32px] max-w-4xl w-full p-6 md:p-8 space-y-6 max-h-[90vh] overflow-y-auto relative">
-            
+    <div id="doc-modal"
+        class="fixed inset-0 z-40 bg-[#010828]/95 backdrop-blur-xl hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div
+            class="liquid-glass rounded-[32px] max-w-4xl w-full p-6 md:p-8 space-y-6 max-h-[90vh] overflow-y-auto relative">
+
             <!-- Close Button -->
-            <button onclick="toggleDocModal(false)" class="absolute top-6 right-6 p-2 rounded-full bg-white/5 border border-white/10 text-cream/80 hover:text-neon">
+            <button onclick="toggleDocModal(false)"
+                class="absolute top-6 right-6 p-2 rounded-full bg-white/5 border border-white/10 text-cream/80 hover:text-neon">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
 
             <header class="border-b border-white/10 pb-4">
-                <span class="text-[9px] text-neon font-bold uppercase tracking-widest font-mono-custom">Progress Report 1 Document</span>
+                <span class="text-[9px] text-neon font-bold uppercase tracking-widest font-mono-custom">Progress Report
+                    1 Document</span>
                 <h2 class="text-3xl font-grotesk text-cream uppercase mt-1">Fuzzy Project Documentation</h2>
             </header>
 
             <div class="space-y-6 text-xs leading-relaxed text-cream/80 font-mono-custom">
-                
+
                 <!-- 1. Problem Statement -->
                 <section class="space-y-2">
                     <h3 class="text-sm font-grotesk text-neon uppercase">1. Problem Statement & Target Users</h3>
                     <p>
-                        University life imposes dynamic, interrelated pressures on students. Academics, sleep deprivation, financial stability, and mental health are heavily dependent on each other, yet traditional student evaluation models are strictly binary or linear (e.g., "you are either failing or passing," "you are either stressed or calm"). 
+                        University life imposes dynamic, interrelated pressures on students. Academics, sleep
+                        deprivation, financial stability, and mental health are heavily dependent on each other, yet
+                        traditional student evaluation models are strictly binary or linear (e.g., "you are either
+                        failing or passing," "you are either stressed or calm").
                     </p>
                     <p>
-                        <strong>Target Users:</strong> University students managing heavy semesters, academic counselors tracking student burnouts, and educational administrators optimizing curriculum design.
+                        <strong>Target Users:</strong> University students managing heavy semesters, academic counselors
+                        tracking student burnouts, and educational administrators optimizing curriculum design.
                     </p>
                 </section>
 
@@ -467,7 +530,11 @@
                 <section class="space-y-2">
                     <h3 class="text-sm font-grotesk text-neon uppercase">2. Why Fuzzy Logic is Appropriate</h3>
                     <p>
-                        Human states like "feeling cooked," "being tired," or "being broke" are fundamentally subjective and vague. There is no precise threshold where a student suddenly transitions from "doing fine" to "completely burnt out." Fuzzy logic excels at uncertainty modeling by mapping these crisp data values to degrees of truth, allowing the simulator to run complex, multi-factor assessments simultaneously and return a smooth, defuzzified "Student Survival Score."
+                        Human states like "feeling cooked," "being tired," or "being broke" are fundamentally subjective
+                        and vague. There is no precise threshold where a student suddenly transitions from "doing fine"
+                        to "completely burnt out." Fuzzy logic excels at uncertainty modeling by mapping these crisp
+                        data values to degrees of truth, allowing the simulator to run complex, multi-factor assessments
+                        simultaneously and return a smooth, defuzzified "Student Survival Score."
                     </p>
                 </section>
 
@@ -477,19 +544,23 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
                         <div class="p-3 bg-[#010828] border border-white/5 rounded-xl">
                             <strong class="text-cream block">Input 1: Assignment Load (0 - 100)</strong>
-                            <span class="text-slate-400 block">Sets: Light [0,0,20,45] | Packed [30,50,50,70] | Overloaded [55,80,100,100]</span>
+                            <span class="text-slate-400 block">Sets: Light [0,0,20,45] | Packed [30,50,50,70] |
+                                Overloaded [55,80,100,100]</span>
                         </div>
                         <div class="p-3 bg-[#010828] border border-white/5 rounded-xl">
                             <strong class="text-cream block">Input 2: Sleep Hours (0 - 12)</strong>
-                            <span class="text-slate-400 block">Sets: Zombie [0,0,3,5] | Functioning [4,6,7,9] | Well-Rested [8,10,12,12]</span>
+                            <span class="text-slate-400 block">Sets: Zombie [0,0,3,5] | Functioning [4,6,7,9] |
+                                Well-Rested [8,10,12,12]</span>
                         </div>
                         <div class="p-3 bg-[#010828] border border-white/5 rounded-xl">
                             <strong class="text-cream block">Input 3: Wallet Balance (0 - 100)</strong>
-                            <span class="text-slate-400 block">Sets: Broke [0,0,15,35] | Surviving [25,45,55,75] | Stable [65,80,100,100]</span>
+                            <span class="text-slate-400 block">Sets: Broke [0,0,15,35] | Surviving [25,45,55,75] |
+                                Stable [65,80,100,100]</span>
                         </div>
                         <div class="p-3 bg-[#010828] border border-white/5 rounded-xl">
                             <strong class="text-cream block">Input 4: Stress Level (0 - 100)</strong>
-                            <span class="text-slate-400 block">Sets: Chilling [0,0,25,45] | Concerned [35,55,65,80] | Screaming [70,85,100,100]</span>
+                            <span class="text-slate-400 block">Sets: Chilling [0,0,25,45] | Concerned [35,55,65,80] |
+                                Screaming [70,85,100,100]</span>
                         </div>
                     </div>
                 </section>
@@ -498,9 +569,11 @@
                 <section class="space-y-2">
                     <h3 class="text-sm font-grotesk text-neon uppercase">4. Firing Rules Base (81 Rules)</h3>
                     <p>
-                        Our system implements a comprehensive 81-rule base covering every combination of inputs. An output score is assigned based on a mathematical scoring of the linguistic combinations.
+                        Our system implements a comprehensive 81-rule base covering every combination of inputs. An
+                        output score is assigned based on a mathematical scoring of the linguistic combinations.
                     </p>
-                    <div class="p-3 bg-[#010828] border border-white/5 rounded-xl max-h-36 overflow-y-auto text-[10px] space-y-1">
+                    <div
+                        class="p-3 bg-[#010828] border border-white/5 rounded-xl max-h-36 overflow-y-auto text-[10px] space-y-1">
                         <div id="doc-rules-list"></div>
                     </div>
                 </section>
@@ -512,7 +585,8 @@
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                             <div class="p-2.5 bg-[#010828] border border-white/5 rounded-xl">
                                 <span class="text-[9px] text-cream/50 block uppercase font-mono-custom">Workload</span>
-                                <span id="audit-workload" class="text-xs font-bold text-cream font-mono-custom">40.0%</span>
+                                <span id="audit-workload"
+                                    class="text-xs font-bold text-cream font-mono-custom">40.0%</span>
                             </div>
                             <div class="p-2.5 bg-[#010828] border border-white/5 rounded-xl">
                                 <span class="text-[9px] text-cream/50 block uppercase font-mono-custom">Sleep</span>
@@ -520,11 +594,13 @@
                             </div>
                             <div class="p-2.5 bg-[#010828] border border-white/5 rounded-xl">
                                 <span class="text-[9px] text-cream/50 block uppercase font-mono-custom">Wallet</span>
-                                <span id="audit-wallet" class="text-xs font-bold text-cream font-mono-custom">RM80.0</span>
+                                <span id="audit-wallet"
+                                    class="text-xs font-bold text-cream font-mono-custom">RM80.0</span>
                             </div>
                             <div class="p-2.5 bg-[#010828] border border-white/5 rounded-xl">
                                 <span class="text-[9px] text-cream/50 block uppercase font-mono-custom">Stress</span>
-                                <span id="audit-stress" class="text-xs font-bold text-cream font-mono-custom">30.0%</span>
+                                <span id="audit-stress"
+                                    class="text-xs font-bold text-cream font-mono-custom">30.0%</span>
                             </div>
                         </div>
 
@@ -537,12 +613,16 @@
 
                         <div class="space-y-2">
                             <div class="flex justify-between items-center">
-                                <strong class="text-[10px] text-cream/60 uppercase tracking-widest font-mono-custom block">LLM-Fuzzy AI Advisor Recommendations:</strong>
-                                <button onclick="generateMotherAdvice()" class="px-2.5 py-1 rounded-[12px] bg-pink-500/20 hover:bg-pink-500 border border-pink-500/30 text-pink-400 hover:text-cream text-[9px] font-bold uppercase transition font-mono-custom flex items-center gap-1">
+                                <strong
+                                    class="text-[10px] text-cream/60 uppercase tracking-widest font-mono-custom block">LLM-Fuzzy
+                                    AI Advisor Recommendations:</strong>
+                                <button onclick="generateMotherAdvice()"
+                                    class="px-2.5 py-1 rounded-[12px] bg-pink-500/20 hover:bg-pink-500 border border-pink-500/30 text-pink-400 hover:text-cream text-[9px] font-bold uppercase transition font-mono-custom flex items-center gap-1">
                                     <i class="fa-solid fa-heart text-[8px]"></i> Ask Mum
                                 </button>
                             </div>
-                            <div id="mother-advice-box" class="hidden p-3 bg-pink-950/20 border border-pink-500/20 rounded-xl mb-2 font-mono-custom">
+                            <div id="mother-advice-box"
+                                class="hidden p-3 bg-pink-950/20 border border-pink-500/20 rounded-xl mb-2 font-mono-custom">
                                 <!-- Mum's advice will load here -->
                             </div>
                             <div id="audit-recommendations" class="text-xs space-y-2 text-cream font-mono-custom">
@@ -557,18 +637,23 @@
     </div>
 
     <!-- SECTION 4: MINI GAMES HUB MODAL -->
-    <div id="minigames-modal" class="fixed inset-0 z-40 bg-[#010828]/60 backdrop-blur-xl hidden flex items-center justify-center p-4 overflow-y-auto">
-        
+    <div id="minigames-modal"
+        class="fixed inset-0 z-40 bg-[#010828]/60 backdrop-blur-xl hidden flex items-center justify-center p-4 overflow-y-auto">
+
         <!-- Dedicated Atmospheric Full Viewport Video Background for Mini Games (like Welcome page) -->
-        <div id="minigames-viewport-bg" class="absolute inset-0 z-0 opacity-0 transition-opacity duration-700 pointer-events-none overflow-hidden">
-            <video id="minigames-viewport-video" class="w-full h-full object-cover" autoplay loop muted playsinline></video>
+        <div id="minigames-viewport-bg"
+            class="absolute inset-0 z-0 opacity-0 transition-opacity duration-700 pointer-events-none overflow-hidden">
+            <video id="minigames-viewport-video" class="w-full h-full object-cover" autoplay loop muted
+                playsinline></video>
             <div class="absolute inset-0 bg-gradient-to-t from-[#010828] via-[#010828]/70 to-[#010828]/50"></div>
         </div>
 
-        <div id="games-container-card" class="liquid-glass rounded-[32px] max-w-4xl w-full p-6 md:p-8 space-y-6 max-h-[90vh] overflow-y-auto relative z-10">
-            
+        <div id="games-container-card"
+            class="liquid-glass rounded-[32px] max-w-4xl w-full p-6 md:p-8 space-y-6 max-h-[90vh] overflow-y-auto relative z-10">
+
             <!-- Close Button -->
-            <button onclick="toggleMiniGamesHub(false)" class="absolute top-6 right-6 p-2 rounded-full bg-white/5 border border-white/10 text-cream/80 hover:text-neon">
+            <button onclick="toggleMiniGamesHub(false)"
+                class="absolute top-6 right-6 p-2 rounded-full bg-white/5 border border-white/10 text-cream/80 hover:text-neon">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
 
@@ -576,39 +661,56 @@
             <div class="absolute inset-0 z-0 opacity-10 pointer-events-none bg-slate-950/40"></div>
 
             <header class="border-b border-white/10 pb-4 z-10 relative">
-                <span class="text-[9px] text-neon font-bold uppercase tracking-widest font-mono-custom">Restoration Hub</span>
+                <span class="text-[9px] text-neon font-bold uppercase tracking-widest font-mono-custom">Restoration
+                    Hub</span>
                 <h2 class="text-3xl font-grotesk text-cream uppercase mt-1">Student Mini Games</h2>
-                <p class="text-xs text-cream/50 mt-1">Strategic recovery activities to optimize your fuzzy parameters.</p>
+                <p class="text-xs text-cream/50 mt-1">Strategic recovery activities to optimize your fuzzy parameters.
+                </p>
             </header>
 
             <!-- Choice Grid -->
             <div id="games-list-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6 z-10 relative">
                 <!-- Game 1: Maggi Chef -->
-                <div class="liquid-glass p-5 rounded-[24px] flex flex-col justify-between h-72 border border-white/5 hover:border-neon/30">
+                <div
+                    class="liquid-glass p-5 rounded-[24px] flex flex-col justify-between h-72 border border-white/5 hover:border-neon/30">
                     <div>
-                        <span class="text-[9px] text-orange-400 font-bold uppercase font-mono-custom">Game 1 • Reflex</span>
+                        <span class="text-[9px] text-orange-400 font-bold uppercase font-mono-custom">Game 1 •
+                            Reflex</span>
                         <h4 class="text-lg font-grotesk text-cream uppercase mt-1 leading-tight">Maggi Chef</h4>
-                        <p class="text-[11px] text-cream/60 mt-2 leading-relaxed">Catch ingredients (eggs, noodles) in your cup while avoiding cockroaches. Replenishes Wallet & Energy.</p>
+                        <p class="text-[11px] text-cream/60 mt-2 leading-relaxed">Catch ingredients (eggs, noodles) in
+                            your cup while avoiding cockroaches. Replenishes Wallet & Energy.</p>
                     </div>
-                    <button onclick="launchMiniGame('maggi')" class="w-full py-2 bg-neon/10 hover:bg-neon hover:text-black border border-neon/30 text-xs font-grotesk rounded-xl transition uppercase">Launch Game</button>
+                    <button onclick="launchMiniGame('maggi')"
+                        class="w-full py-2 bg-neon/10 hover:bg-neon hover:text-black border border-neon/30 text-xs font-grotesk rounded-xl transition uppercase">Launch
+                        Game</button>
                 </div>
                 <!-- Game 2: Finals Crammer -->
-                <div class="liquid-glass p-5 rounded-[24px] flex flex-col justify-between h-72 border border-white/5 hover:border-neon/30">
+                <div
+                    class="liquid-glass p-5 rounded-[24px] flex flex-col justify-between h-72 border border-white/5 hover:border-neon/30">
                     <div>
-                        <span class="text-[9px] text-indigo-400 font-bold uppercase font-mono-custom">Game 2 • Typing</span>
+                        <span class="text-[9px] text-indigo-400 font-bold uppercase font-mono-custom">Game 2 •
+                            Typing</span>
                         <h4 class="text-lg font-grotesk text-cream uppercase mt-1 leading-tight">Finals Crammer</h4>
-                        <p class="text-[11px] text-cream/60 mt-2 leading-relaxed">Type falling fuzzy logic keywords quickly to absorb slides. Reduces Assignment Load.</p>
+                        <p class="text-[11px] text-cream/60 mt-2 leading-relaxed">Type falling fuzzy logic keywords
+                            quickly to absorb slides. Reduces Assignment Load.</p>
                     </div>
-                    <button onclick="launchMiniGame('crammer')" class="w-full py-2 bg-neon/10 hover:bg-neon hover:text-black border border-neon/30 text-xs font-grotesk rounded-xl transition uppercase">Launch Game</button>
+                    <button onclick="launchMiniGame('crammer')"
+                        class="w-full py-2 bg-neon/10 hover:bg-neon hover:text-black border border-neon/30 text-xs font-grotesk rounded-xl transition uppercase">Launch
+                        Game</button>
                 </div>
                 <!-- Game 3: Sleep Sheep -->
-                <div class="liquid-glass p-5 rounded-[24px] flex flex-col justify-between h-72 border border-white/5 hover:border-neon/30">
+                <div
+                    class="liquid-glass p-5 rounded-[24px] flex flex-col justify-between h-72 border border-white/5 hover:border-neon/30">
                     <div>
-                        <span class="text-[9px] text-pink-400 font-bold uppercase font-mono-custom">Game 3 • Clicking</span>
+                        <span class="text-[9px] text-pink-400 font-bold uppercase font-mono-custom">Game 3 •
+                            Clicking</span>
                         <h4 class="text-lg font-grotesk text-cream uppercase mt-1 leading-tight">Sleep Sheep</h4>
-                        <p class="text-[11px] text-cream/60 mt-2 leading-relaxed">Tap on soft-glowing cosmic sheep to quiet your brain and sleep. Restores Sleep & reduces Stress.</p>
+                        <p class="text-[11px] text-cream/60 mt-2 leading-relaxed">Tap on soft-glowing cosmic sheep to
+                            quiet your brain and sleep. Restores Sleep & reduces Stress.</p>
                     </div>
-                    <button onclick="launchMiniGame('sheep')" class="w-full py-2 bg-neon/10 hover:bg-neon hover:text-black border border-neon/30 text-xs font-grotesk rounded-xl transition uppercase">Launch Game</button>
+                    <button onclick="launchMiniGame('sheep')"
+                        class="w-full py-2 bg-neon/10 hover:bg-neon hover:text-black border border-neon/30 text-xs font-grotesk rounded-xl transition uppercase">Launch
+                        Game</button>
                 </div>
             </div>
 
@@ -616,18 +718,22 @@
             <div id="game-play-area" class="hidden flex flex-col items-center justify-center space-y-4 z-10 relative">
                 <!-- Mini Game Looping Video Backdrop container inside canvas -->
                 <div class="absolute inset-0 z-0 opacity-20 pointer-events-none rounded-[24px] overflow-hidden">
-                    <video id="game-video-bg" class="w-full h-full object-cover" autoplay loop muted playsinline></video>
+                    <video id="game-video-bg" class="w-full h-full object-cover" autoplay loop muted
+                        playsinline></video>
                 </div>
 
-                <div class="flex justify-between items-center w-full bg-[#010828]/80 p-3 rounded-xl border border-white/10 z-10 font-mono-custom">
+                <div
+                    class="flex justify-between items-center w-full bg-[#010828]/80 p-3 rounded-xl border border-white/10 z-10 font-mono-custom">
                     <span id="game-hud-title" class="text-xs font-bold text-neon uppercase">Game Running...</span>
                     <span id="game-hud-timer" class="text-xs text-cream font-bold">Time Left: 20s</span>
                 </div>
 
-                <canvas id="canvas-minigame" class="w-full h-[320px] bg-slate-950/60 border border-white/10 rounded-2xl z-10 relative"></canvas>
+                <canvas id="canvas-minigame"
+                    class="w-full h-[320px] bg-slate-950/60 border border-white/10 rounded-2xl z-10 relative"></canvas>
 
                 <div class="flex gap-3 w-full z-10 font-mono-custom">
-                    <button id="exit-current-game-btn" onclick="abortMiniGame()" class="flex-1 py-2.5 bg-red-950/40 hover:bg-red-500 text-cream text-xs font-bold rounded-xl transition uppercase border border-red-500/20">
+                    <button id="exit-current-game-btn" onclick="abortMiniGame()"
+                        class="flex-1 py-2.5 bg-red-950/40 hover:bg-red-500 text-cream text-xs font-bold rounded-xl transition uppercase border border-red-500/20">
                         Exit / Give Up
                     </button>
                 </div>
@@ -647,11 +753,11 @@
             'Week 5': { progress: 35.5, title: "Week 5: Mid-Sem Test Futsal", text: "Mid-sem test is tomorrow morning, but friends invite you for late-night Mamak/Futsal.", c1: { name: "Go Mamak (Milo Ais & Roti)", a: 0, s: -3, w: -10, st: -15 }, c2: { name: "Grind in study room", a: 5, s: 1, w: 0, st: 20 } },
             'Week 6': { progress: 42.6, title: "Week 6: Maggie Cup Era", text: "PTPTN is gone. You are officially broke. Food budget is depleted.", c1: { name: "Eat instant noodles for 3 days", a: 0, s: -2, w: 20, st: 10 }, c2: { name: "Borrow RM50 from roomie", a: 0, s: 0, w: 10, st: 15 } },
             'Week 7': { progress: 49.7, title: "Week 7: Mid-Sem Break Kampung", text: "Mid-sem break is here. Go back kampung to rest, or stay in hostel to work?", c1: { name: "Balik Kampung (Free food!)", a: 10, s: 3, w: -15, st: -25 }, c2: { name: "Stay in hostel to grind", a: -20, s: -1, w: 0, st: 10 } },
-            'Week 8': { progress: 56.8, title: "Week 8: Printing Shop Crisis", text: "It's 11:45 PM. Assignment deadline at 11:59. Hostel printer is jammed.", c1: { name: "Sprint to 24h shop (pay double)", a: -10, s: -1, w: -15, st: 25 }, c2: { name: "Email excuse to lecturer", a: 10, s: 1, w: 0, st: 10 } },
+            'Week 8': { progress: 56.8, title: "Week 8: Printing Shop Crisis", text: "It's 11:45 PM. Assignment deadline at 11:59. Hostel printer is jammed.", c1: { name: "Sprint to 7ELEVEN (pay double)", a: -10, s: -1, w: -15, st: 25 }, c2: { name: "Email excuse to lecturer", a: 10, s: 1, w: 0, st: 10 } },
             'Week 9': { progress: 63.9, title: "Week 9: 8 AM Lecture Heavy Rain", text: "It is pouring rain outside. You have an 8 AM lecture with attendance check.", c1: { name: "Ponteng & continue sleeping", a: 10, s: 3, w: 0, st: -10 }, c2: { name: "Redah rain with umbrella", a: 0, s: -1, w: 0, st: 15 } },
-            'Week 10': { progress: 71.0, title: "Week 10: Surprise Pop Quiz", text: "You walked into class and the lecturer announces a surprise test.", c1: { name: "Tembak / Guess all answers", a: 10, s: 0, w: 0, st: 5 }, c2: { name: "Stress out trying to write", a: 5, s: 0, w: 0, st: 20 } },
-            'Week 11': { progress: 78.1, title: "Week 11: Blue Screen of Death", text: "Your laptop crashed and blue-screened while writing your lab report.", c1: { name: "Send to Digital Mall (pay repair)", a: 0, s: 0, w: -30, st: 20 }, c2: { name: "Borrow roomie laptop at 2 AM", a: 5, s: -3, w: 0, st: 15 } },
-            'Week 12': { progress: 85.2, title: "Week 12: Carry Marks Reveal", text: "Carry marks are released. You need a high grade in finals just to pass.", c1: { name: "Cope with Starbucks drink", a: 0, s: 0, w: -18, st: 10 }, c2: { name: "Lock in & study 10h/day", a: 10, s: -2, w: 0, st: 25 } },
+            'Week 10': { progress: 71.0, title: "Week 10: Surprise Pop Quiz", text: "You walked into class and the lecturer announces a surprise test.", c1: { name: "Tembak all answers", a: 10, s: 0, w: 0, st: 5 }, c2: { name: "Stress out trying to write", a: 5, s: 0, w: 0, st: 20 } },
+            'Week 11': { progress: 78.1, title: "Week 11: Blue Screen of Death", text: "Your laptop crashed and blue-screened while writing your lab report.", c1: { name: "Send to Setia City Mall (pay repair)", a: 0, s: 0, w: -30, st: 20 }, c2: { name: "Borrow roomie laptop at 2 AM", a: 5, s: -3, w: 0, st: 15 } },
+            'Week 12': { progress: 85.2, title: "Week 12: Carry Marks Reveal", text: "Carry marks are released. You need a high grade in finals just to pass.", c1: { name: "Cope with Tealive drink", a: 0, s: 0, w: -18, st: 10 }, c2: { name: "Lock in & study 10h/day", a: 10, s: -2, w: 0, st: 25 } },
             'Week 13': { progress: 92.3, title: "Week 13: Study Week Scramble", text: "Study week starts. You haven't opened your lecture notes since Week 2.", c1: { name: "Watch 2x speed YouTube summaries", a: 15, s: -2, w: 0, st: 15 }, c2: { name: "Grind 14 chapters textbook", a: -10, s: -4, w: 0, st: 30 } },
             'Week 14': { progress: 100.0, title: "Week 14: Finals Paper", text: "The exam hall is freezing cold. The paper looks like hieroglyphics.", c1: { name: "Write whatever you know (Tawakal)", a: 0, s: 0, w: 0, st: 15 }, c2: { name: "Fight till the last second", a: 0, s: -2, w: 0, st: 25 } }
         };
@@ -669,7 +775,7 @@
             const docRulesList = document.getElementById('doc-rules-list');
             if (window.FuzzyEngine) {
                 docRulesList.innerHTML = window.FuzzyEngine.RULES.map((r, i) => {
-                    return `<div class="py-0.5"><span class="text-neon">[Rule ${i+1}]</span> ${r.text}</div>`;
+                    return `<div class="py-0.5"><span class="text-neon">[Rule ${i + 1}]</span> ${r.text}</div>`;
                 }).join('');
             }
         }
@@ -678,12 +784,12 @@
         function enterDashboard() {
             const welcome = document.getElementById('welcome-screen');
             const dashboard = document.getElementById('game-dashboard');
-            
+
             // Fade out welcome
             welcome.style.opacity = '0';
             setTimeout(() => {
                 welcome.classList.add('hidden');
-                
+
                 // Show dashboard
                 dashboard.classList.remove('hidden');
                 requestAnimationFrame(() => {
@@ -698,12 +804,12 @@
         function exitToWelcome() {
             const welcome = document.getElementById('welcome-screen');
             const dashboard = document.getElementById('game-dashboard');
-            
+
             // Fade out dashboard
             dashboard.style.opacity = '0';
             setTimeout(() => {
                 dashboard.classList.add('hidden');
-                
+
                 // Show welcome
                 welcome.classList.remove('hidden');
                 setTimeout(() => {
@@ -786,7 +892,7 @@
 
             const canvas = document.getElementById('canvas-minigame');
             const ctx = canvas.getContext('2d');
-            
+
             // Adjust canvas sizing
             const w = canvas.clientWidth || 600;
             const h = canvas.clientHeight || 320;
@@ -821,7 +927,7 @@
         // MINI-GAME 1: MAGGI CHEF (Reflex Catching Game - Glow Vectors, No Emojis)
         function runMaggiGame(canvas, ctx, w, h) {
             document.getElementById('game-hud-title').innerText = "Maggi Chef - Catch Fuel & Food! (Avoid Red Triangles)";
-            
+
             let basket = { x: w / 2 - 25, y: h - 35, width: 50, height: 12 };
             let items = [];
             let score = 0;
@@ -836,7 +942,7 @@
                     { color: '#ef4444', isDanger: true, type: 'lipas' }         // Red triangle cockroach
                 ];
                 const randType = types[Math.floor(Math.random() * types.length)];
-                
+
                 items.push({
                     x: Math.random() * (w - 20) + 10,
                     y: -10,
@@ -937,7 +1043,7 @@
         // MINI-GAME 2: FINALS CRAMMER (Typing Scramble - No Emojis, Sleek Laser Capsules)
         function runCrammerGame(canvas, ctx, w, h) {
             document.getElementById('game-hud-title').innerText = "Finals Crammer - Type words before they hit the ground!";
-            
+
             const wordsList = ['MAMDANI', 'CENTROID', 'DEFUZZY', 'FUZZY', 'LINGUISTIC', 'INFERENCE', 'ORBIS', 'ZUSCOFFEE', 'PTPTN', 'COOKED'];
             let words = [];
             let activeInput = "";
@@ -996,12 +1102,12 @@
                     ctx.fillStyle = 'rgba(1, 8, 40, 0.85)';
                     ctx.strokeStyle = '#6FFF00';
                     ctx.lineWidth = 1;
-                    
+
                     const textWidth = ctx.measureText(word.text).width;
                     const paddingX = 10;
                     const paddingY = 6;
                     ctx.beginPath();
-                    ctx.roundRect(word.x - textWidth/2 - paddingX, word.y - 8 - paddingY/2, textWidth + paddingX*2, 16 + paddingY, 6);
+                    ctx.roundRect(word.x - textWidth / 2 - paddingX, word.y - 8 - paddingY / 2, textWidth + paddingX * 2, 16 + paddingY, 6);
                     ctx.fill();
                     ctx.stroke();
                     ctx.shadowBlur = 0;
@@ -1045,7 +1151,7 @@
         // MINI-GAME 3: SLEEP SHEEP (Pulsing Orbs clicking - Glowing energy bubbles, No Emojis)
         function runSheepGame(canvas, ctx, w, h) {
             document.getElementById('game-hud-title').innerText = "Sleep Sheep - Pop glowing energy bubbles to calm your mind!";
-            
+
             let sheep = [];
             let score = 0;
             let sleepRestored = 0;
@@ -1167,17 +1273,17 @@
 
             // Simple visual alert box on dashboard
             alert(`Mini Game Complete!\n\nRewards Claimed:\nWorkload: ${res.a}%\nSleep: +${res.s}h\nWallet: +RM${res.w}\nStress: ${res.st}%`);
-            
+
             currentGame = null;
         }
 
         function abortMiniGame() {
             if (gameTimerId) clearInterval(gameTimerId);
             if (gameLoopId) cancelAnimationFrame(gameLoopId);
-            
+
             const videoBg = document.getElementById('game-video-bg');
             if (videoBg) videoBg.pause();
-            
+
             // Reset viewport video back to general hub ambient loop
             const viewVid = document.getElementById('minigames-viewport-video');
             if (viewVid) {
@@ -1194,7 +1300,7 @@
             const slider = document.getElementById(sliderId);
             const display = document.getElementById(valueId);
 
-            slider.oninput = function() {
+            slider.oninput = function () {
                 const val = isFloat ? parseFloat(this.value) : parseInt(this.value);
                 display.innerText = val.toFixed(isFloat ? 1 : 1);
                 gameState[stateProp] = val;
@@ -1293,7 +1399,7 @@
             document.getElementById('status-badge').innerText = results.status;
 
             const dialogue = document.getElementById('dialogue-box');
-            
+
             // Only overwrite dialogue if not waiting for Gen-Z AI commentary response
             if (!dialogue.innerHTML.includes('Roomie is typing...')) {
                 if (results.status === 'Thriving') {
@@ -1437,7 +1543,7 @@
         function drawMembershipChart(canvasId, sets, value, maxDomain, isFloat = false) {
             const canvas = document.getElementById(canvasId);
             if (!canvas || canvas.clientWidth === 0) return;
-            
+
             const ctx = canvas.getContext('2d');
             const w = canvas.clientWidth;
             const h = canvas.clientHeight;
@@ -1523,7 +1629,7 @@
                 const color = colors[sIdx % colors.length];
                 const peakCenter = p.length === 4 ? (p[1] + p[2]) / 2 : p[1];
                 let labelX = mX(peakCenter);
-                
+
                 // Adjust edge labels for perfect visibility
                 if (sIdx === 0 && peakCenter === 0) labelX = mX(maxDomain * 0.1);
                 if (sIdx === 2 && peakCenter === maxDomain) labelX = mX(maxDomain * 0.9);
@@ -1559,7 +1665,7 @@
         function drawDefuzzificationChart(canvasId, curve, centroid) {
             const canvas = document.getElementById(canvasId);
             if (!canvas || canvas.clientWidth === 0) return;
-            
+
             const ctx = canvas.getContext('2d');
             const w = canvas.clientWidth;
             const h = canvas.clientHeight;
@@ -1725,7 +1831,7 @@
             `;
 
             const result = await callServerApi('/api/mum-advice', { prompt: statsPrompt });
-            
+
             if (result && result.text) {
                 advBox.innerHTML = `
                     <div class="flex items-start gap-2.5">
@@ -1766,7 +1872,7 @@
             `;
 
             const result = await callServerApi('/api/companion-reaction', { prompt: prompt });
-            
+
             if (result && result.text) {
                 dialogue.innerText = `"${result.text.replace(/"/g, '').trim()}"`;
             } else {
@@ -1791,4 +1897,5 @@
         window.addEventListener('resize', runFuzzyInference);
     </script>
 </body>
+
 </html>
