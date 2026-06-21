@@ -12,12 +12,12 @@ const envPath = path.join(__dirname, '.env');
 try {
     if (fs.existsSync(envPath)) {
         const envContent = fs.readFileSync(envPath, 'utf8');
-        
+
         const geminiMatch = envContent.match(/GEMINI_API_KEY\s*=\s*([^\r\n]*)/);
         if (geminiMatch) {
             geminiApiKey = geminiMatch[1].trim().replace(/['"]/g, '');
         }
-        
+
         const groqMatch = envContent.match(/GROQ_API_KEY\s*=\s*([^\r\n]*)/);
         if (groqMatch) {
             groqApiKey = groqMatch[1].trim().replace(/['"]/g, '');
@@ -49,8 +49,8 @@ function callGemini(prompt, systemInstruction) {
                     { role: 'system', content: systemInstruction },
                     { role: 'user', content: prompt }
                 ],
-                max_tokens: 800,
-                temperature: 0.7
+                max_tokens: 180,
+                temperature: 0.8
             });
 
             const req = https.request(url, {
@@ -96,8 +96,8 @@ function callGemini(prompt, systemInstruction) {
                     parts: [{ text: systemInstruction }]
                 },
                 generationConfig: {
-                    maxOutputTokens: 800,
-                    temperature: 0.7
+                    maxOutputTokens: 180,
+                    temperature: 0.8
                 }
             });
 
@@ -168,14 +168,14 @@ const server = http.createServer((req, res) => {
             res.writeHead(404, { 'Content-Type': 'text/plain' });
             res.end('Not Found');
         }
-    } 
+    }
     // 2. POST Requests: API Proxy Router
     else if (method === 'POST') {
         let body = '';
         req.on('data', chunk => body += chunk);
         req.on('end', async () => {
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            
+
             let parsedRequest = {};
             try {
                 parsedRequest = JSON.parse(body);
@@ -187,15 +187,15 @@ const server = http.createServer((req, res) => {
 
             if (url === '/api/mum-advice') {
                 const systemInstruction = `
-                    You are a highly dramatic, worrisome, loving, and strict Malaysian mother checking up on her child in university (talking like a typical worrying mom on WhatsApp).
-                    You are reviewing their current stats. You must speak directly to your child (using terms like "anak bertuah", "anak mama", "you").
-                    Use typical Malaysian WhatsApp style (Manglish/Bahasa Rojak) like "lah", "anak", "makan", "study", "pergi tidur", "membazir", "exam", "ya Rabbi", "adoiii", "risau".
-                    Write a detailed, very lengthy response (around 6-10 sentences, or multiple paragraphs) with lots of maternal concern, emotional guilt-tripping, and drama. Make it feel like a real long dramatic message from a worrisome mom who is extremely panicked about your well-being.
-                    If they are doing badly (e.g., low sleep, low wallet, high stress, or high assignment load), show immense worry, gasping/dramatic text, but always end with heartfelt encouragement and telling them how much you love them and believe they can do it.
-                    If they are doing well, praise them but warn them not to get distracted or lazy (classic Asian mother concern).
-                    Do not talk about mathematics, fuzzy engine, or percentages. Do not use standard graphical emojis (use text emojis like :\( or ... if needed).
+                    You are a loving, caring, and slightly worried Malaysian mother checking on your university child through WhatsApp.
+                    Speak mostly in natural English, but occasionally use simple Malaysian words like "lah", "anak", "makan", "tidur", "sayang", "risau", "ya Allah", and "adoi". Keep it sounding warm and realistic.
+                    Give gentle advice based on the student's condition. If they are stressed, tired, overloaded, or low on money, show concern and remind them to take care of themselves. If they are doing well, praise them and remind them not to neglect their health or studies.
+                    Be supportive rather than overly dramatic. Sound like a real mother who worries because she cares.
+                    Keep the response concise (3-5 sentences maximum).
+                    Do not mention numbers, percentages, mathematics, fuzzy logic, or game mechanics.
+                    Do not use emojis.
                 `;
-                
+
                 try {
                     const text = await callGemini(parsedRequest.prompt, systemInstruction);
                     res.end(JSON.stringify({ text }));
@@ -204,10 +204,12 @@ const server = http.createServer((req, res) => {
                 }
             } else if (url === '/api/companion-reaction') {
                 const systemInstruction = `
-                    You are a Gen-Z Malaysian university roommate giving a blunt, witty "Roommate's Verdict" on the player's choice or current campus situation.
-                    The player is trying to survive the semester. Speak directly to them, reacting to their choices with trendy Gen-Z Malaysian campus slang (like "weyh", "koyak", "noob", "Zus Coffee", "passenger", "lepak", "membazir", "vibes", "cooked", "spill the tea", "slay", "no cap", "fr", "respectfully", "glow up").
-                    Give a raw, funny, and cool assessment. Example: "Respectfully, I have no idea how you made it this far" or "Bro is literally cooking but the kitchen is on fire, no cap."
-                    Do not limit your response length; give a complete, detailed, funny, and cool assessment of their choice, explaining why it was a good/bad choice in a long hilarious Gen-Z lecture. Do not use emojis.
+                    You are a chill Malaysian university roommate giving honest opinions and practical advice to help your friend survive the semester.
+                    Speak mainly in casual English, but occasionally use Malaysian slang and words like "weyh", "lah", "lepak", "makan", "bro", and "koyak". Keep the tone funny, relatable, and supportive.
+                    React to the situation with light humour and a bit of Gen-Z energy, but always include useful advice. Avoid excessive memes or random slang.
+                    Keep your response concise (2-4 sentences maximum).
+                    Do not mention numbers, percentages, fuzzy logic, game mechanics, or technical details.
+                    Do not use emojis.
                 `;
 
                 try {
