@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Cooked Are You? - Student Survival Simulator</title>
+    <!-- Tailwind CSS CDN & Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        neon: '#6FFF00',
+                        cream: '#EFF4FF',
+                        darknavy: '#010828',
+                    }
+                }
+            }
+        };
+    </script>
+    <!-- Core Fuzzy Logic Engine -->
+    <script src="fuzzyEngine.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Condiment&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* FONTS ALIASES */
+        .font-grotesk {
+            font-family: 'Anton', sans-serif;
+            letter-spacing: 0.05em;
+        }
+        .font-condiment {
+            font-family: 'Condiment', cursive;
+        }
+        .font-mono-custom {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+
+        /* COLOR SYSTEM */
+        :root {
+            --bg-color: #010828;
+            --color-cream: #EFF4FF;
+            --color-neon: #6FFF00;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--color-cream);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* FIXED LIQUID GLASS EFFECT (Cross-browser reliable + highly visible glow borders) */
+        .liquid-glass {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 
+                inset 0 1px 1px rgba(255, 255, 255, 0.2),
+                0 10px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .liquid-glass:hover {
+            border-color: rgba(111, 255, 0, 0.3);
+            box-shadow: 
+                inset 0 1px 2px rgba(255, 255, 255, 0.3),
+                0 0 20px rgba(111, 255, 0, 0.1),
+                0 15px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        /* TEXTURE OVERLAY */
+        .texture-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            pointer-events: none;
+            opacity: 0.05;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* BACKGROUND VIDEO */
+        .bg-video-container {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -10;
+            opacity: 0.15;
+        }
+        .bg-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Custom range slider styling matching Orbis.Nft */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: 6px;
+            border-radius: 9999px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            background: var(--color-neon);
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(111, 255, 0, 0.6);
+            transition: all 0.2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.25);
+            box-shadow: 0 0 18px var(--color-neon);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(1, 8, 40, 0.5);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--color-neon);
+        }
+
+        /* Highlighted Choice Buttons with prominent borders */
+        .choice-btn {
+            background: rgba(255, 255, 255, 0.02);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .choice-btn:hover {
+            background: rgba(111, 255, 0, 0.08);
+            border-color: var(--color-neon);
+            box-shadow: 0 0 15px rgba(111, 255, 0, 0.2);
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body class="font-mono-custom selection:bg-neon selection:text-black">
+
+    <!-- Texture Overlay -->
+    <div class="texture-overlay"></div>
+
+    <!-- Background Cosmic Video Loop -->
+    <div class="bg-video-container">
+        <video class="bg-video" autoplay loop muted playsinline>
+            <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_045634_e1c98c76-1265-4f5c-882a-4276f2080894.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <!-- SECTION 1: WELCOME SCREEN (Full Viewport Landing Page) -->
+    <section id="welcome-screen" class="relative min-h-screen flex flex-col justify-between p-6 md:p-12 z-20 transition-all duration-700 bg-[#010828]/40">
+        
+        <!-- Welcome Screen Video Background -->
+        <div class="absolute inset-0 z-0">
+            <video class="w-full h-full object-cover" autoplay loop muted playsinline>
+                <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_045634_e1c98c76-1265-4f5c-882a-4276f2080894.mp4" type="video/mp4">
+            </video>
+            <div class="absolute inset-0 bg-gradient-to-t from-[#010828] via-transparent to-[#010828]/50"></div>
+        </div>
+
+        <!-- Header Row -->
+        <div class="z-10 flex justify-between items-center max-w-[1831px] w-full mx-auto font-mono-custom">
+            <span class="text-xl font-grotesk tracking-widest text-cream uppercase">Orbis.Fuzzy</span>
+            <button onclick="toggleDocModal(true)" class="text-xs font-mono-custom text-neon uppercase tracking-widest hover:underline">
+                View Project Docs
+            </button>
+        </div>
+
+        <!-- Center Landing Title -->
+        <div class="z-10 text-center max-w-3xl mx-auto my-auto space-y-6">
+            <div class="relative inline-block">
+                <h2 class="text-5xl sm:text-7xl md:text-8xl font-grotesk text-cream uppercase leading-none tracking-tight">
+                    How Cooked<br>Are You?
+                </h2>
+                <!-- Cursive overlay -->
+                <span class="text-3xl sm:text-5xl font-condiment text-neon absolute -right-6 -bottom-6 transform -rotate-6 select-none">
+                    survival simulator
+                </span>
+            </div>
+
+            <p class="text-xs sm:text-sm text-cream/70 leading-relaxed max-w-xl mx-auto uppercase tracking-wide pt-4 font-mono-custom">
+                A 14-week Malaysian university semester simulator driven by a mathematical Mamdani Fuzzy Inference Engine.
+            </p>
+
+            <div class="pt-6">
+                <button onclick="enterDashboard()" class="px-8 py-4 text-sm font-grotesk rounded-full text-cream liquid-glass tracking-wider uppercase hover:bg-neon hover:text-black">
+                    Start Semester
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer Info -->
+        <div class="z-10 flex flex-col md:flex-row justify-between items-center max-w-[1831px] w-full mx-auto text-[10px] text-cream/40 tracking-widest uppercase gap-2 font-mono-custom">
+            <span>Powered by Mamdani FLC</span>
+            <span>© 2026 Orbis.Fuzzy. All Rights Reserved.</span>
+        </div>
+    </section>
+
+    <!-- SECTION 2: THE GAME PLAY DASHBOARD (Hidden initially) -->
+    <main id="game-dashboard" class="max-w-[1831px] mx-auto p-4 md:p-8 space-y-6 hidden opacity-0 transition-opacity duration-700">
+        
+        <!-- HEADER -->
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center p-6 liquid-glass rounded-[28px] gap-4">
+            <div>
+                <h1 class="text-3xl font-grotesk text-cream tracking-wider uppercase">
+                    How Cooked Are You?
+                </h1>
+                <div class="relative inline-block mt-0.5">
+                    <span class="text-xs font-condiment text-neon text-lg lowercase">A fuzzy student survival system</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-6 font-mono-custom">
+                <!-- Status Badge -->
+                <div class="px-5 py-3 rounded-[20px] liquid-glass text-center min-w-[150px]">
+                    <span class="text-[9px] text-cream/60 font-bold uppercase tracking-wider block">Survival state</span>
+                    <span id="status-badge" class="text-lg font-grotesk text-neon tracking-wide uppercase">Cooked</span>
+                </div>
+                <!-- Centroid Display -->
+                <div class="px-5 py-3 rounded-[20px] liquid-glass text-center min-w-[120px]">
+                    <span class="text-[9px] text-cream/60 font-bold uppercase tracking-wider block">Centroid</span>
+                    <span id="centroid-display" class="text-lg font-grotesk text-cream tracking-wide font-mono-custom">50.00</span>
+                </div>
+                
+                <div class="flex gap-2">
+                    <!-- Mini Games button -->
+                    <button onclick="openMiniGamesHub()" class="px-4 py-3 rounded-[20px] liquid-glass text-neon hover:text-neon/80 text-xs font-grotesk uppercase">
+                        <i class="fa-solid fa-gamepad mr-2"></i>Mini Games
+                    </button>
+                    <!-- Documentation button -->
+                    <button onclick="toggleDocModal(true)" class="px-4 py-3 rounded-[20px] liquid-glass text-cream/60 hover:text-neon text-xs font-grotesk uppercase">
+                        <i class="fa-solid fa-file-lines mr-2"></i>Docs
+                    </button>
+                    <!-- Back to Welcome button -->
+                    <button onclick="exitToWelcome()" class="p-3 rounded-full liquid-glass text-cream/60 hover:text-neon text-xs">
+                        <i class="fa-solid fa-house"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN LAYOUT -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- LEFT COLUMN: THE PLAY ZONE (5 Cols) -->
+            <div class="lg:col-span-5 space-y-6">
+                
+                <!-- CHARACTER CARD (Clean cinematic display without overlapping avatar emoji) -->
+                <div class="liquid-glass rounded-[32px] h-80 flex flex-col justify-between relative overflow-hidden">
+                    
+                    <!-- Loop Video Backdrop inside Card -->
+                    <div class="absolute inset-0 z-0">
+                        <video class="w-full h-full object-cover" autoplay loop muted playsinline>
+                            <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_151551_992053d1-3d3e-4b8c-abac-45f22158f411.mp4" type="video/mp4">
+                        </video>
+                    </div>
+
+                    <div class="flex justify-between items-center w-full z-10 p-5 font-mono-custom">
+                        <span class="text-[9px] bg-[#010828]/90 text-cream font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-white/10">
+                            Companion Stream
+                        </span>
+                        <div class="flex items-center gap-1.5 bg-[#010828]/60 px-2 py-0.5 rounded-full border border-white/5">
+                            <span class="w-2 h-2 rounded-full bg-neon animate-ping"></span>
+                            <span class="text-[8px] text-cream/80">LIVE</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Text Overlay Dialogue Panel at the bottom (Allows full view of the video backdrop) -->
+                    <div class="bg-[#010828]/85 p-5 rounded-b-[32px] border-t border-white/10 z-10 font-mono-custom">
+                        <span class="text-[9px] text-neon font-bold uppercase tracking-wider block">Companion Comments:</span>
+                        <p id="dialogue-box" class="text-xs text-cream mt-1.5 italic font-semibold leading-relaxed">
+                            "We are surviving, barely."
+                        </p>
+                    </div>
+                </div>
+
+                <!-- SEMESTER STAGE TIMELINE -->
+                <div class="liquid-glass rounded-[32px] p-6 space-y-4">
+                    <div class="flex justify-between items-center font-mono-custom">
+                        <h2 class="text-xs font-grotesk text-cream/70 uppercase tracking-widest">Semester Timeline</h2>
+                        <span id="stage-badge" class="text-xs bg-neon/10 text-neon font-bold px-3 py-1 rounded-full border border-neon/20 uppercase tracking-wider font-mono-custom">
+                            Week 1
+                        </span>
+                    </div>
+                    
+                    <!-- Progress Bar (Represents 14 weeks) -->
+                    <div class="w-full bg-[#010828] h-3 rounded-full overflow-hidden border border-white/10 p-[1px]">
+                        <div id="timeline-progress" class="bg-gradient-to-r from-neon via-yellow-400 to-red-500 h-full rounded-full transition-all duration-500" style="width: 7.14%"></div>
+                    </div>
+
+                    <!-- Choice Event Box -->
+                    <div id="choice-card" class="bg-[#010828]/40 border border-white/5 rounded-[24px] p-5 space-y-4">
+                        <h3 id="event-title" class="text-sm font-grotesk text-neon tracking-wide uppercase">Friends Invite You to Zus</h3>
+                        <p id="event-text" class="text-xs text-cream/70 leading-relaxed font-mono-custom">"I literally said I’m saving money this month… but that Matcha Latte looking kinda convincing."</p>
+                        
+                        <div class="grid grid-cols-2 gap-3 pt-1">
+                            <button id="choice-1-btn" onclick="makeChoice(1)" class="choice-btn px-4 py-3 text-xs font-grotesk rounded-xl text-cream uppercase">
+                                Choice 1
+                            </button>
+                            <button id="choice-2-btn" onclick="makeChoice(2)" class="choice-btn px-4 py-3 text-xs font-grotesk rounded-xl text-cream/60 uppercase">
+                                Choice 2
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CRISP VARIABLE CONTROLS -->
+                <div class="liquid-glass rounded-[32px] p-6 space-y-5">
+                    <h2 class="text-xs font-grotesk text-cream/70 uppercase tracking-widest">Variable Adjuster</h2>
+                    
+                    <!-- Assignment Load -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-cream/80 font-semibold flex items-center gap-2 font-mono-custom">
+                                <i class="fa-solid fa-book-open text-neon w-4"></i> Assignment Load
+                            </span>
+                            <span id="val-assignment" class="font-mono-custom text-neon font-bold">40.0</span>
+                        </div>
+                        <input type="range" id="slider-assignment" min="0" max="100" value="40" class="w-full">
+                    </div>
+
+                    <!-- Sleep Hours -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-cream/80 font-semibold flex items-center gap-2 font-mono-custom">
+                                <i class="fa-solid fa-moon text-neon w-4"></i> Sleep Hours
+                            </span>
+                            <span id="val-sleep" class="font-mono-custom text-neon font-bold">7.0</span>
+                        </div>
+                        <input type="range" id="slider-sleep" min="0" max="12" step="0.1" value="7.0" class="w-full">
+                    </div>
+
+                    <!-- Wallet Balance -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-cream/80 font-semibold flex items-center gap-2 font-mono-custom">
+                                <i class="fa-solid fa-wallet text-neon w-4"></i> Wallet Balance
+                            </span>
+                            <span id="val-wallet" class="font-mono-custom text-neon font-bold">80.0</span>
+                        </div>
+                        <input type="range" id="slider-wallet" min="0" max="100" value="80" class="w-full">
+                    </div>
+
+                    <!-- Stress Level -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-cream/80 font-semibold flex items-center gap-2 font-mono-custom">
+                                <i class="fa-solid fa-brain text-neon w-4"></i> Stress Level
+                            </span>
+                            <span id="val-stress" class="font-mono-custom text-neon font-bold">30.0</span>
+                        </div>
+                        <input type="range" id="slider-stress" min="0" max="100" value="30" class="w-full">
+                    </div>
+
+                    <!-- Mini Games managed at header bar -->
+
+                    <button onclick="resetGame()" class="w-full py-3 bg-[#010828]/60 hover:bg-white/10 border border-white/10 text-[10px] font-grotesk rounded-xl transition-all uppercase tracking-widest text-cream/70 hover:text-neon">
+                        Reset State variables
+                    </button>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: ANALYTICS HUB (7 Cols) -->
+            <div class="lg:col-span-7 space-y-6">
+                
+                <!-- FUZZIFICATION INPUT CHARTS -->
+                <div class="liquid-glass rounded-[32px] p-6">
+                    <h2 class="text-xs font-grotesk text-cream/70 uppercase tracking-widest mb-4 font-mono-custom">Linguistic Fuzzification Scopes</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-[#010828]/60 p-3.5 rounded-[24px] border border-white/10">
+                            <span class="text-[9px] text-neon font-bold uppercase tracking-wider font-mono-custom">Assignment Load Sets</span>
+                            <canvas id="canvas-assignment" class="w-full h-24 mt-2"></canvas>
+                        </div>
+                        <div class="bg-[#010828]/60 p-3.5 rounded-[24px] border border-white/10">
+                            <span class="text-[9px] text-neon font-bold uppercase tracking-wider font-mono-custom">Sleep Hour Sets</span>
+                            <canvas id="canvas-sleep" class="w-full h-24 mt-2"></canvas>
+                        </div>
+                        <div class="bg-[#010828]/60 p-3.5 rounded-[24px] border border-white/10">
+                            <span class="text-[9px] text-neon font-bold uppercase tracking-wider font-mono-custom">Wallet Balance Sets</span>
+                            <canvas id="canvas-wallet" class="w-full h-24 mt-2"></canvas>
+                        </div>
+                        <div class="bg-[#010828]/60 p-3.5 rounded-[24px] border border-white/10">
+                            <span class="text-[9px] text-neon font-bold uppercase tracking-wider font-mono-custom">Stress Level Sets</span>
+                            <canvas id="canvas-stress" class="w-full h-24 mt-2"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DEFUZZIFICATION OUTPUT CHART -->
+                <div class="liquid-glass rounded-[32px] p-6">
+                    <h2 class="text-xs font-grotesk text-cream/70 uppercase tracking-widest mb-4">Aggregation & Defuzzification</h2>
+                    <div class="bg-[#010828]/60 p-4 rounded-[24px] border border-white/10">
+                        <span class="text-[9px] text-cream/60 font-bold uppercase tracking-wider font-mono-custom">Aggregated Output Curve [Union of Clipped Rules]</span>
+                        <canvas id="canvas-defuzz" class="w-full h-48 mt-2"></canvas>
+                    </div>
+                </div>
+
+                <!-- ACTIVE RULES -->
+                <div class="liquid-glass rounded-[32px] p-6">
+                    <h2 class="text-xs font-grotesk text-cream/70 uppercase tracking-widest mb-4 font-mono-custom">Firing Rules Engine</h2>
+                    <div id="rules-box" class="space-y-2.5 max-h-52 overflow-y-auto pr-2 text-[10px] font-mono-custom">
+                        <!-- Rules list injected here -->
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- SECTION 3: INTERACTIVE DOCUMENTATION OVERLAY -->
+    <div id="doc-modal" class="fixed inset-0 z-40 bg-[#010828]/95 backdrop-blur-xl hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="liquid-glass rounded-[32px] max-w-4xl w-full p-6 md:p-8 space-y-6 max-h-[90vh] overflow-y-auto relative">
+            
+            <!-- Close Button -->
+            <button onclick="toggleDocModal(false)" class="absolute top-6 right-6 p-2 rounded-full bg-white/5 border border-white/10 text-cream/80 hover:text-neon">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <header class="border-b border-white/10 pb-4">
+                <span class="text-[9px] text-neon font-bold uppercase tracking-widest font-mono-custom">Progress Report 1 Document</span>
+                <h2 class="text-3xl font-grotesk text-cream uppercase mt-1">Fuzzy Project Documentation</h2>
+            </header>
+
+            <div class="space-y-6 text-xs leading-relaxed text-cream/80 font-mono-custom">
+                
+                <!-- 1. Problem Statement -->
+                <section class="space-y-2">
+                    <h3 class="text-sm font-grotesk text-neon uppercase">1. Problem Statement & Target Users</h3>
+                    <p>
+                        University life imposes dynamic, interrelated pressures on students. Academics, sleep deprivation, financial stability, and mental health are heavily dependent on each other, yet traditional student evaluation models are strictly binary or linear (e.g., "you are either failing or passing," "you are either stressed or calm"). 
+                    </p>
+                    <p>
+                        <strong>Target Users:</strong> University students managing heavy semesters, academic counselors tracking student burnouts, and educational administrators optimizing curriculum design.
+                    </p>
+                </section>
+
+                <!-- 2. Fuzzy Rationale -->
+                <section class="space-y-2">
+                    <h3 class="text-sm font-grotesk text-neon uppercase">2. Why Fuzzy Logic is Appropriate</h3>
+                    <p>
+                        Human states like "feeling cooked," "being tired," or "being broke" are fundamentally subjective and vague. There is no precise threshold where a student suddenly transitions from "doing fine" to "completely burnt out." Fuzzy logic excels at uncertainty modeling by mapping these crisp data values to degrees of truth, allowing the simulator to run complex, multi-factor assessments simultaneously and return a smooth, defuzzified "Student Survival Score."
+                    </p>
+                </section>
+
+                <!-- 3. Variables & Sets -->
+                <section class="space-y-2">
+                    <h3 class="text-sm font-grotesk text-neon uppercase">3. Fuzzy Variable Definitions</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                        <div class="p-3 bg-[#010828] border border-white/5 rounded-xl">
+                            <strong class="text-cream block">Input 1: Assignment Load (0 - 100)</strong>
+                            <span class="text-slate-400 block">Sets: Light [0,0,20,45] | Packed [30,50,50,70] | Overloaded [55,80,100,100]</span>
+                        </div>
+                        <div class="p-3 bg-[#010828] border border-white/5 rounded-xl">
+                            <strong class="text-cream block">Input 2: Sleep Hours (0 - 12)</strong>
+                            <span class="text-slate-400 block">Sets: Zombie [0,0,3,5] | Functioning [4,6,7,9] | Well-Rested [8,10,12,12]</span>
+                        </div>
+                        <div class="p-3 bg-[#010828] border border-white/5 rounded-xl">
+                            <strong class="text-cream block">Input 3: Wallet Balance (0 - 100)</strong>
+                            <span class="text-slate-400 block">Sets: Broke [0,0,15,35] | Surviving [25,45,55,75] | Stable [65,80,100,100]</span>
+                        </div>
+                        <div class="p-3 bg-[#010828] border border-white/5 rounded-xl">
+                            <strong class="text-cream block">Input 4: Stress Level (0 - 100)</strong>
+                            <span class="text-slate-400 block">Sets: Chilling [0,0,25,45] | Concerned [35,55,65,80] | Screaming [70,85,100,100]</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. Rules Overview -->
+                <section class="space-y-2">
+                    <h3 class="text-sm font-grotesk text-neon uppercase">4. Firing Rules Base (81 Rules)</h3>
+                    <p>
+                        Our system implements a comprehensive 81-rule base covering every combination of inputs. An output score is assigned based on a mathematical scoring of the linguistic combinations.
+                    </p>
+                    <div class="p-3 bg-[#010828] border border-white/5 rounded-xl max-h-36 overflow-y-auto text-[10px] space-y-1">
+                        <div id="doc-rules-list"></div>
+                    </div>
+                </section>
+
+                <!-- 5. Dynamic Student Audit & Recommendations -->
+                <section class="space-y-2 border-t border-white/10 pt-4">
+                    <h3 class="text-sm font-grotesk text-neon uppercase">5. Live Semester Audit & Recommendations</h3>
+                    <div class="p-4 bg-[#010828]/95 border border-neon/20 rounded-[24px] space-y-4">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                            <div class="p-2.5 bg-[#010828] border border-white/5 rounded-xl">
+                                <span class="text-[9px] text-cream/50 block uppercase font-mono-custom">Workload</span>
+                                <span id="audit-workload" class="text-xs font-bold text-cream font-mono-custom">40.0%</span>
+                            </div>
+                            <div class="p-2.5 bg-[#010828] border border-white/5 rounded-xl">
+                                <span class="text-[9px] text-cream/50 block uppercase font-mono-custom">Sleep</span>
+                                <span id="audit-sleep" class="text-xs font-bold text-cream font-mono-custom">7.0h</span>
+                            </div>
+                            <div class="p-2.5 bg-[#010828] border border-white/5 rounded-xl">
+                                <span class="text-[9px] text-cream/50 block uppercase font-mono-custom">Wallet</span>
+                                <span id="audit-wallet" class="text-xs font-bold text-cream font-mono-custom">RM80.0</span>
+                            </div>
+                            <div class="p-2.5 bg-[#010828] border border-white/5 rounded-xl">
+                                <span class="text-[9px] text-cream/50 block uppercase font-mono-custom">Stress</span>
+                                <span id="audit-stress" class="text-xs font-bold text-cream font-mono-custom">30.0%</span>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-neon/10 border border-neon/20 rounded-xl">
+                            <div class="flex justify-between items-center text-xs font-bold font-mono-custom">
+                                <span>CURRENT STATUS: <span id="audit-status" class="text-neon">COOKED</span></span>
+                                <span>SURVIVAL SCORE: <span id="audit-score" class="text-neon">50.00</span></span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                                <strong class="text-[10px] text-cream/60 uppercase tracking-widest font-mono-custom block">LLM-Fuzzy AI Advisor Recommendations:</strong>
+                                <button onclick="generateMotherAdvice()" class="px-2.5 py-1 rounded-[12px] bg-pink-500/20 hover:bg-pink-500 border border-pink-500/30 text-pink-400 hover:text-cream text-[9px] font-bold uppercase transition font-mono-custom flex items-center gap-1">
+                                    <i class="fa-solid fa-heart text-[8px]"></i> Ask Mum
+                                </button>
+                            </div>
+                            <div id="mother-advice-box" class="hidden p-3 bg-pink-950/20 border border-pink-500/20 rounded-xl mb-2 font-mono-custom">
+                                <!-- Mum's advice will load here -->
+                            </div>
+                            <div id="audit-recommendations" class="text-xs space-y-2 text-cream font-mono-custom">
+                                <!-- Dynamic recommendations injected here -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 4: MINI GAMES HUB MODAL -->
+    <div id="minigames-modal" class="fixed inset-0 z-40 bg-[#010828]/60 backdrop-blur-xl hidden flex items-center justify-center p-4 overflow-y-auto">
+        
+        <!-- Dedicated Atmospheric Full Viewport Video Background for Mini Games (like Welcome page) -->
+        <div id="minigames-viewport-bg" class="absolute inset-0 z-0 opacity-0 transition-opacity duration-700 pointer-events-none overflow-hidden">
+            <video id="minigames-viewport-video" class="w-full h-full object-cover" autoplay loop muted playsinline></video>
+            <div class="absolute inset-0 bg-gradient-to-t from-[#010828] via-[#010828]/70 to-[#010828]/50"></div>
+        </div>
+
+        <div id="games-container-card" class="liquid-glass rounded-[32px] max-w-4xl w-full p-6 md:p-8 space-y-6 max-h-[90vh] overflow-y-auto relative z-10">
+            
+            <!-- Close Button -->
+            <button onclick="toggleMiniGamesHub(false)" class="absolute top-6 right-6 p-2 rounded-full bg-white/5 border border-white/10 text-cream/80 hover:text-neon">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <!-- Card Inner Subtle Backdrop -->
+            <div class="absolute inset-0 z-0 opacity-10 pointer-events-none bg-slate-950/40"></div>
+
+            <header class="border-b border-white/10 pb-4 z-10 relative">
+                <span class="text-[9px] text-neon font-bold uppercase tracking-widest font-mono-custom">Restoration Hub</span>
+                <h2 class="text-3xl font-grotesk text-cream uppercase mt-1">Student Mini Games</h2>
+                <p class="text-xs text-cream/50 mt-1">Strategic recovery activities to optimize your fuzzy parameters.</p>
+            </header>
+
+            <!-- Choice Grid -->
+            <div id="games-list-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6 z-10 relative">
+                <!-- Game 1: Maggi Chef -->
+                <div class="liquid-glass p-5 rounded-[24px] flex flex-col justify-between h-72 border border-white/5 hover:border-neon/30">
+                    <div>
+                        <span class="text-[9px] text-orange-400 font-bold uppercase font-mono-custom">Game 1 • Reflex</span>
+                        <h4 class="text-lg font-grotesk text-cream uppercase mt-1 leading-tight">Maggi Chef</h4>
+                        <p class="text-[11px] text-cream/60 mt-2 leading-relaxed">Catch ingredients (eggs, noodles) in your cup while avoiding cockroaches. Replenishes Wallet & Energy.</p>
+                    </div>
+                    <button onclick="launchMiniGame('maggi')" class="w-full py-2 bg-neon/10 hover:bg-neon hover:text-black border border-neon/30 text-xs font-grotesk rounded-xl transition uppercase">Launch Game</button>
+                </div>
+                <!-- Game 2: Finals Crammer -->
+                <div class="liquid-glass p-5 rounded-[24px] flex flex-col justify-between h-72 border border-white/5 hover:border-neon/30">
+                    <div>
+                        <span class="text-[9px] text-indigo-400 font-bold uppercase font-mono-custom">Game 2 • Typing</span>
+                        <h4 class="text-lg font-grotesk text-cream uppercase mt-1 leading-tight">Finals Crammer</h4>
+                        <p class="text-[11px] text-cream/60 mt-2 leading-relaxed">Type falling fuzzy logic keywords quickly to absorb slides. Reduces Assignment Load.</p>
+                    </div>
+                    <button onclick="launchMiniGame('crammer')" class="w-full py-2 bg-neon/10 hover:bg-neon hover:text-black border border-neon/30 text-xs font-grotesk rounded-xl transition uppercase">Launch Game</button>
+                </div>
+                <!-- Game 3: Sleep Sheep -->
+                <div class="liquid-glass p-5 rounded-[24px] flex flex-col justify-between h-72 border border-white/5 hover:border-neon/30">
+                    <div>
+                        <span class="text-[9px] text-pink-400 font-bold uppercase font-mono-custom">Game 3 • Clicking</span>
+                        <h4 class="text-lg font-grotesk text-cream uppercase mt-1 leading-tight">Sleep Sheep</h4>
+                        <p class="text-[11px] text-cream/60 mt-2 leading-relaxed">Tap on soft-glowing cosmic sheep to quiet your brain and sleep. Restores Sleep & reduces Stress.</p>
+                    </div>
+                    <button onclick="launchMiniGame('sheep')" class="w-full py-2 bg-neon/10 hover:bg-neon hover:text-black border border-neon/30 text-xs font-grotesk rounded-xl transition uppercase">Launch Game</button>
+                </div>
+            </div>
+
+            <!-- Dedicated Game Play Canvas Wrapper (Hidden initially) -->
+            <div id="game-play-area" class="hidden flex flex-col items-center justify-center space-y-4 z-10 relative">
+                <!-- Mini Game Looping Video Backdrop container inside canvas -->
+                <div class="absolute inset-0 z-0 opacity-20 pointer-events-none rounded-[24px] overflow-hidden">
+                    <video id="game-video-bg" class="w-full h-full object-cover" autoplay loop muted playsinline></video>
+                </div>
+
+                <div class="flex justify-between items-center w-full bg-[#010828]/80 p-3 rounded-xl border border-white/10 z-10 font-mono-custom">
+                    <span id="game-hud-title" class="text-xs font-bold text-neon uppercase">Game Running...</span>
+                    <span id="game-hud-timer" class="text-xs text-cream font-bold">Time Left: 20s</span>
+                </div>
+
+                <canvas id="canvas-minigame" class="w-full h-[320px] bg-slate-950/60 border border-white/10 rounded-2xl z-10 relative"></canvas>
+
+                <div class="flex gap-3 w-full z-10 font-mono-custom">
+                    <button id="exit-current-game-btn" onclick="abortMiniGame()" class="flex-1 py-2.5 bg-red-950/40 hover:bg-red-500 text-cream text-xs font-bold rounded-xl transition uppercase border border-red-500/20">
+                        Exit / Give Up
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // 14-WEEK MALAYSIAN UNIVERSITY TIMELINE SCENARIOS
+        const timelineStages = {
+            'Week 1': { progress: 7.1, title: "Week 1: Add/Drop Portal Crash", text: "Student portal crashes during course registration. You need to add a core elective. What do you do?", c1: { name: "Spam refresh at 4 AM", a: 0, s: -3, w: 0, st: 20 }, c2: { name: "Redha and take elective left over", a: 15, s: 0, w: 0, st: 5 } },
+            'Week 2': { progress: 14.2, title: "Week 2: PTPTN Money Inflow", text: "Your scholarship / PTPTN allowance just entered your account! Do you celebrate?", c1: { name: "Belanja friends Zus Coffee", a: 0, s: 0, w: -25, st: -10 }, c2: { name: "Keep it for Maggie era", a: 0, s: 0, w: 20, st: 5 } },
+            'Week 3': { progress: 21.3, title: "Week 3: Persatuan Club Recruitment", text: "You are invited to join the high committee of a massive campus event.", c1: { name: "Join for resume points", a: 20, s: -1, w: -5, st: 15 }, c2: { name: "Stay in hostel & chill", a: -5, s: 1, w: 0, st: -5 } },
+            'Week 4': { progress: 28.4, title: "Week 4: Passenger Team Member", text: "A classmate known to be a passenger (free rider) begs to join your group project.", c1: { name: "Accept (Tanggung biawak hidup)", a: 25, s: 0, w: 0, st: 20 }, c2: { name: "Reject them directly", a: -10, s: 0, w: 0, st: 5 } },
+            'Week 5': { progress: 35.5, title: "Week 5: Mid-Sem Test Futsal", text: "Mid-sem test is tomorrow morning, but friends invite you for late-night Mamak/Futsal.", c1: { name: "Go Mamak (Milo Ais & Roti)", a: 0, s: -3, w: -10, st: -15 }, c2: { name: "Grind in study room", a: 5, s: 1, w: 0, st: 20 } },
+            'Week 6': { progress: 42.6, title: "Week 6: Maggie Cup Era", text: "PTPTN is gone. You are officially broke. Food budget is depleted.", c1: { name: "Eat instant noodles for 3 days", a: 0, s: -2, w: 20, st: 10 }, c2: { name: "Borrow RM50 from roomie", a: 0, s: 0, w: 10, st: 15 } },
+            'Week 7': { progress: 49.7, title: "Week 7: Mid-Sem Break Kampung", text: "Mid-sem break is here. Go back kampung to rest, or stay in hostel to work?", c1: { name: "Balik Kampung (Free food!)", a: 10, s: 3, w: -15, st: -25 }, c2: { name: "Stay in hostel to grind", a: -20, s: -1, w: 0, st: 10 } },
+            'Week 8': { progress: 56.8, title: "Week 8: Printing Shop Crisis", text: "It's 11:45 PM. Assignment deadline at 11:59. Hostel printer is jammed.", c1: { name: "Sprint to 24h shop (pay double)", a: -10, s: -1, w: -15, st: 25 }, c2: { name: "Email excuse to lecturer", a: 10, s: 1, w: 0, st: 10 } },
+            'Week 9': { progress: 63.9, title: "Week 9: 8 AM Lecture Heavy Rain", text: "It is pouring rain outside. You have an 8 AM lecture with attendance check.", c1: { name: "Ponteng & continue sleeping", a: 10, s: 3, w: 0, st: -10 }, c2: { name: "Redah rain with umbrella", a: 0, s: -1, w: 0, st: 15 } },
+            'Week 10': { progress: 71.0, title: "Week 10: Surprise Pop Quiz", text: "You walked into class and the lecturer announces a surprise test.", c1: { name: "Tembak / Guess all answers", a: 10, s: 0, w: 0, st: 5 }, c2: { name: "Stress out trying to write", a: 5, s: 0, w: 0, st: 20 } },
+            'Week 11': { progress: 78.1, title: "Week 11: Blue Screen of Death", text: "Your laptop crashed and blue-screened while writing your lab report.", c1: { name: "Send to Digital Mall (pay repair)", a: 0, s: 0, w: -30, st: 20 }, c2: { name: "Borrow roomie laptop at 2 AM", a: 5, s: -3, w: 0, st: 15 } },
+            'Week 12': { progress: 85.2, title: "Week 12: Carry Marks Reveal", text: "Carry marks are released. You need a high grade in finals just to pass.", c1: { name: "Cope with Starbucks drink", a: 0, s: 0, w: -18, st: 10 }, c2: { name: "Lock in & study 10h/day", a: 10, s: -2, w: 0, st: 25 } },
+            'Week 13': { progress: 92.3, title: "Week 13: Study Week Scramble", text: "Study week starts. You haven't opened your lecture notes since Week 2.", c1: { name: "Watch 2x speed YouTube summaries", a: 15, s: -2, w: 0, st: 15 }, c2: { name: "Grind 14 chapters textbook", a: -10, s: -4, w: 0, st: 30 } },
+            'Week 14': { progress: 100.0, title: "Week 14: Finals Paper", text: "The exam hall is freezing cold. The paper looks like hieroglyphics.", c1: { name: "Write whatever you know (Tawakal)", a: 0, s: 0, w: 0, st: 15 }, c2: { name: "Fight till the last second", a: 0, s: -2, w: 0, st: 25 } }
+        };
+
+        const stageOrder = ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7', 'Week 8', 'Week 9', 'Week 10', 'Week 11', 'Week 12', 'Week 13', 'Week 14'];
+
+        function init() {
+            setupSlider('slider-assignment', 'val-assignment', 'assignmentLoad', 100);
+            setupSlider('slider-sleep', 'val-sleep', 'sleepHours', 12, true);
+            setupSlider('slider-wallet', 'val-wallet', 'walletBalance', 100);
+            setupSlider('slider-stress', 'val-stress', 'stressLevel', 100);
+            resetGame();
+
+            // Populate docs modal rule list
+            const docRulesList = document.getElementById('doc-rules-list');
+            if (window.FuzzyEngine) {
+                docRulesList.innerHTML = window.FuzzyEngine.RULES.map((r, i) => {
+                    return `<div class="py-0.5"><span class="text-neon">[Rule ${i+1}]</span> ${r.text}</div>`;
+                }).join('');
+            }
+        }
+
+        // NAVIGATION FLOW
+        function enterDashboard() {
+            const welcome = document.getElementById('welcome-screen');
+            const dashboard = document.getElementById('game-dashboard');
+            
+            // Fade out welcome
+            welcome.style.opacity = '0';
+            setTimeout(() => {
+                welcome.classList.add('hidden');
+                
+                // Show dashboard
+                dashboard.classList.remove('hidden');
+                requestAnimationFrame(() => {
+                    setTimeout(() => {
+                        dashboard.style.opacity = '1';
+                        runFuzzyInference();
+                    }, 100);
+                });
+            }, 500);
+        }
+
+        function exitToWelcome() {
+            const welcome = document.getElementById('welcome-screen');
+            const dashboard = document.getElementById('game-dashboard');
+            
+            // Fade out dashboard
+            dashboard.style.opacity = '0';
+            setTimeout(() => {
+                dashboard.classList.add('hidden');
+                
+                // Show welcome
+                welcome.classList.remove('hidden');
+                setTimeout(() => {
+                    welcome.style.opacity = '1';
+                }, 50);
+            }, 500);
+        }
+
+        function toggleDocModal(show) {
+            const modal = document.getElementById('doc-modal');
+            if (show) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        // MINI GAMES HUB LOGIC
+        function toggleMiniGamesHub(show) {
+            const modal = document.getElementById('minigames-modal');
+            const viewBg = document.getElementById('minigames-viewport-bg');
+            const viewVid = document.getElementById('minigames-viewport-video');
+            if (show) {
+                modal.classList.remove('hidden');
+                document.getElementById('games-list-grid').classList.remove('hidden');
+                document.getElementById('game-play-area').classList.add('hidden');
+            } else {
+                modal.classList.add('hidden');
+                if (viewBg) {
+                    viewBg.classList.remove('opacity-30');
+                    viewBg.classList.add('opacity-0');
+                }
+                if (viewVid) viewVid.pause();
+                abortMiniGame();
+            }
+        }
+
+        function openMiniGamesHub() {
+            toggleMiniGamesHub(true);
+            const viewBg = document.getElementById('minigames-viewport-bg');
+            const viewVid = document.getElementById('minigames-viewport-video');
+            if (viewBg && viewVid) {
+                // Default selection hub ambient loop
+                viewVid.src = "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_053923_22c0a6a5-313c-474c-85ff-3b50d25e944a.mp4";
+                viewVid.play().catch(err => console.log("Video play failed:", err));
+                viewBg.classList.remove('opacity-0');
+                viewBg.classList.add('opacity-30');
+            }
+        }
+
+        let currentGame = null;
+        let gameLoopId = null;
+        let gameTimeLeft = 20;
+        let gameTimerId = null;
+
+        const gameVideos = {
+            maggi: "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_053923_22c0a6a5-313c-474c-85ff-3b50d25e944a.mp4",
+            crammer: "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_054411_511c1b7a-fb2f-42ef-bf6c-32c0b1a06e79.mp4",
+            sheep: "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_055427_ac7035b5-9f3b-4289-86fc-941b2432317d.mp4"
+        };
+
+        function launchMiniGame(gameType) {
+            document.getElementById('games-list-grid').classList.add('hidden');
+            const playArea = document.getElementById('game-play-area');
+            playArea.classList.remove('hidden');
+
+            // Set full-viewport video background for this specific game
+            const viewVid = document.getElementById('minigames-viewport-video');
+            if (viewVid) {
+                viewVid.src = gameVideos[gameType];
+                viewVid.play().catch(err => console.log("Video play failed:", err));
+            }
+
+            // Set video background for this game
+            const videoBg = document.getElementById('game-video-bg');
+            if (videoBg) {
+                videoBg.src = gameVideos[gameType];
+                videoBg.play().catch(err => console.log("Video play failed:", err));
+            }
+
+            const canvas = document.getElementById('canvas-minigame');
+            const ctx = canvas.getContext('2d');
+            
+            // Adjust canvas sizing
+            const w = canvas.clientWidth || 600;
+            const h = canvas.clientHeight || 320;
+            canvas.width = w * window.devicePixelRatio;
+            canvas.height = h * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+            currentGame = gameType;
+            gameTimeLeft = 20;
+            document.getElementById('game-hud-timer').innerText = `Time Left: ${gameTimeLeft}s`;
+
+            // Start countdown
+            if (gameTimerId) clearInterval(gameTimerId);
+            gameTimerId = setInterval(() => {
+                gameTimeLeft--;
+                document.getElementById('game-hud-timer').innerText = `Time Left: ${gameTimeLeft}s`;
+                if (gameTimeLeft <= 0) {
+                    endMiniGame(true);
+                }
+            }, 1000);
+
+            // Launch Game States
+            if (gameType === 'maggi') {
+                runMaggiGame(canvas, ctx, w, h);
+            } else if (gameType === 'crammer') {
+                runCrammerGame(canvas, ctx, w, h);
+            } else if (gameType === 'sheep') {
+                runSheepGame(canvas, ctx, w, h);
+            }
+        }
+
+        // MINI-GAME 1: MAGGI CHEF (Reflex Catching Game - Glow Vectors, No Emojis)
+        function runMaggiGame(canvas, ctx, w, h) {
+            document.getElementById('game-hud-title').innerText = "Maggi Chef - Catch Fuel & Food! (Avoid Red Triangles)";
+            
+            let basket = { x: w / 2 - 25, y: h - 35, width: 50, height: 12 };
+            let items = [];
+            let score = 0;
+            let walletGained = 0;
+            let sleepGained = 0;
+            let stressGained = 0;
+
+            function spawnItem() {
+                const types = [
+                    { color: '#6FFF00', radius: 6, score: 10, type: 'food' },   // Neon green Food
+                    { color: '#3b82f6', radius: 5, score: 8, type: 'sleep' },   // Blue Energy
+                    { color: '#ef4444', isDanger: true, type: 'lipas' }         // Red triangle cockroach
+                ];
+                const randType = types[Math.floor(Math.random() * types.length)];
+                
+                items.push({
+                    x: Math.random() * (w - 20) + 10,
+                    y: -10,
+                    vy: Math.random() * 2 + 1.5,
+                    ...randType
+                });
+            }
+
+            // Keyboard/Mouse listener
+            const moveHandler = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = (e.clientX - rect.left) * (w / rect.width);
+                basket.x = Math.max(0, Math.min(w - basket.width, mouseX - basket.width / 2));
+            };
+            window.addEventListener('mousemove', moveHandler);
+
+            function update() {
+                if (currentGame !== 'maggi') {
+                    window.removeEventListener('mousemove', moveHandler);
+                    return;
+                }
+
+                if (Math.random() < 0.04) spawnItem();
+
+                ctx.clearRect(0, 0, w, h);
+
+                // Draw Basket (Sleek Glass Tray with Neon Border)
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = '#6FFF00';
+                ctx.fillStyle = 'rgba(255,255,255,0.05)';
+                ctx.strokeStyle = '#6FFF00';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.roundRect(basket.x, basket.y, basket.width, basket.height, 4);
+                ctx.fill();
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+
+                // Draw Items
+                for (let i = items.length - 1; i >= 0; i--) {
+                    let item = items[i];
+                    item.y += item.vy;
+
+                    ctx.shadowBlur = 6;
+                    ctx.shadowColor = item.color;
+                    ctx.fillStyle = item.color;
+
+                    if (item.isDanger) {
+                        // Draw Cockroach as a glowing red triangle
+                        ctx.beginPath();
+                        ctx.moveTo(item.x, item.y - 6);
+                        ctx.lineTo(item.x - 6, item.y + 6);
+                        ctx.lineTo(item.x + 6, item.y + 6);
+                        ctx.closePath();
+                        ctx.fill();
+                    } else {
+                        // Draw Food/Energy as glowing circles
+                        ctx.beginPath();
+                        ctx.arc(item.x, item.y, item.radius, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    ctx.shadowBlur = 0;
+
+                    // Collision Check
+                    if (item.y + 6 >= basket.y && item.x >= basket.x && item.x <= basket.x + basket.width) {
+                        if (item.isDanger) {
+                            stressGained += 5;
+                        } else if (item.type === 'food') {
+                            walletGained += 4;
+                            score += item.score;
+                        } else if (item.type === 'sleep') {
+                            sleepGained += 0.5;
+                            score += item.score;
+                        }
+                        items.splice(i, 1);
+                    } else if (item.y > h) {
+                        items.splice(i, 1);
+                    }
+                }
+
+                // HUD Stats on screen
+                ctx.fillStyle = '#EFF4FF';
+                ctx.font = '8px ui-monospace, monospace';
+                ctx.fillText(`Score: ${score}`, 15, 20);
+                ctx.fillText(`Funds Gained: +RM${walletGained}`, 15, 32);
+                ctx.fillText(`Energy Recovers: +${sleepGained.toFixed(1)}h`, 15, 44);
+                ctx.fillText(`Stress Penalty: +${stressGained}%`, 15, 56);
+
+                // Save game stats modifications for end
+                canvas.gameResults = { w: walletGained, s: sleepGained, st: stressGained, a: 0 };
+
+                gameLoopId = requestAnimationFrame(update);
+            }
+
+            update();
+        }
+
+        // MINI-GAME 2: FINALS CRAMMER (Typing Scramble - No Emojis, Sleek Laser Capsules)
+        function runCrammerGame(canvas, ctx, w, h) {
+            document.getElementById('game-hud-title').innerText = "Finals Crammer - Type words before they hit the ground!";
+            
+            const wordsList = ['MAMDANI', 'CENTROID', 'DEFUZZY', 'FUZZY', 'LINGUISTIC', 'INFERENCE', 'ORBIS', 'ZUSCOFFEE', 'PTPTN', 'COOKED'];
+            let words = [];
+            let activeInput = "";
+            let score = 0;
+            let workloadReduced = 0;
+            let stressPenalty = 0;
+
+            function spawnWord() {
+                const txt = wordsList[Math.floor(Math.random() * wordsList.length)];
+                words.push({
+                    text: txt,
+                    x: Math.random() * (w - 120) + 60,
+                    y: -10,
+                    vy: Math.random() * 0.8 + 0.6
+                });
+            }
+
+            // Keyboard listener
+            const keyHandler = (e) => {
+                const key = e.key.toUpperCase();
+                if (key === 'ENTER' || key === ' ') {
+                    // Match check
+                    let foundIndex = words.findIndex(w => w.text === activeInput);
+                    if (foundIndex !== -1) {
+                        words.splice(foundIndex, 1);
+                        workloadReduced += 6;
+                        score += 15;
+                    }
+                    activeInput = "";
+                } else if (key.length === 1 && /[A-Z]/.test(key)) {
+                    activeInput += key;
+                } else if (key === 'BACKSPACE') {
+                    activeInput = activeInput.slice(0, -1);
+                }
+            };
+            window.addEventListener('keydown', keyHandler);
+
+            function update() {
+                if (currentGame !== 'crammer') {
+                    window.removeEventListener('keydown', keyHandler);
+                    return;
+                }
+
+                if (Math.random() < 0.02) spawnWord();
+
+                ctx.clearRect(0, 0, w, h);
+
+                // Draw Words
+                for (let i = words.length - 1; i >= 0; i--) {
+                    let word = words[i];
+                    word.y += word.vy;
+
+                    // Draw capsule button border for each word
+                    ctx.shadowBlur = 5;
+                    ctx.shadowColor = '#6FFF00';
+                    ctx.fillStyle = 'rgba(1, 8, 40, 0.85)';
+                    ctx.strokeStyle = '#6FFF00';
+                    ctx.lineWidth = 1;
+                    
+                    const textWidth = ctx.measureText(word.text).width;
+                    const paddingX = 10;
+                    const paddingY = 6;
+                    ctx.beginPath();
+                    ctx.roundRect(word.x - textWidth/2 - paddingX, word.y - 8 - paddingY/2, textWidth + paddingX*2, 16 + paddingY, 6);
+                    ctx.fill();
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
+
+                    // Text
+                    ctx.fillStyle = '#EFF4FF';
+                    ctx.font = 'bold 9px ui-monospace, monospace';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(word.text, word.x, word.y + 4);
+                    ctx.textAlign = 'left'; // reset
+
+                    // Hit bottom check
+                    if (word.y > h - 10) {
+                        words.splice(i, 1);
+                        stressPenalty += 4;
+                    }
+                }
+
+                // Draw Input Bar
+                ctx.fillStyle = 'rgba(255,255,255,0.05)';
+                ctx.fillRect(0, h - 30, w, 30);
+                ctx.fillStyle = '#6FFF00';
+                ctx.font = 'bold 11px ui-monospace, monospace';
+                ctx.fillText(`> CRAMMING: ${activeInput}_`, 15, h - 11);
+
+                // HUD Stats
+                ctx.fillStyle = '#EFF4FF';
+                ctx.font = '8px ui-monospace, monospace';
+                ctx.fillText(`Score: ${score}`, 15, 20);
+                ctx.fillText(`Workload Reduced: -${workloadReduced}%`, 15, 32);
+                ctx.fillText(`Stress Overhead: +${stressPenalty}%`, 15, 44);
+
+                canvas.gameResults = { a: -workloadReduced, st: stressPenalty, w: 0, s: 0 };
+
+                gameLoopId = requestAnimationFrame(update);
+            }
+
+            update();
+        }
+
+        // MINI-GAME 3: SLEEP SHEEP (Pulsing Orbs clicking - Glowing energy bubbles, No Emojis)
+        function runSheepGame(canvas, ctx, w, h) {
+            document.getElementById('game-hud-title').innerText = "Sleep Sheep - Pop glowing energy bubbles to calm your mind!";
+            
+            let sheep = [];
+            let score = 0;
+            let sleepRestored = 0;
+            let stressReduced = 0;
+
+            function spawnSheep() {
+                sheep.push({
+                    x: Math.random() * (w - 40) + 20,
+                    y: h + 20,
+                    vy: -(Math.random() * 0.6 + 0.4),
+                    radius: Math.random() * 10 + 12,
+                    pulse: Math.random() * Math.PI,
+                    color: `hsla(${Math.random() * 60 + 120}, 100%, 70%, 0.4)` // Neon green/blue hues
+                });
+            }
+
+            const clickHandler = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const clickX = (e.clientX - rect.left) * (w / rect.width);
+                const clickY = (e.clientY - rect.top) * (h / rect.height);
+
+                for (let i = sheep.length - 1; i >= 0; i--) {
+                    let s = sheep[i];
+                    let dist = Math.hypot(clickX - s.x, clickY - s.y);
+                    if (dist <= s.radius) {
+                        sheep.splice(i, 1);
+                        sleepRestored += 0.5;
+                        stressReduced += 5;
+                        score += 10;
+                        break;
+                    }
+                }
+            };
+            canvas.addEventListener('mousedown', clickHandler);
+
+            function update() {
+                if (currentGame !== 'sheep') {
+                    canvas.removeEventListener('mousedown', clickHandler);
+                    return;
+                }
+
+                if (Math.random() < 0.03) spawnSheep();
+
+                ctx.clearRect(0, 0, w, h);
+
+                // Draw Sheep (Soft glowing energy orbs)
+                for (let i = sheep.length - 1; i >= 0; i--) {
+                    let s = sheep[i];
+                    s.y += s.vy;
+                    s.pulse += 0.05;
+
+                    // Dynamic pulsing radius
+                    let r = s.radius + Math.sin(s.pulse) * 2;
+
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = '#6FFF00';
+                    ctx.fillStyle = s.color;
+                    ctx.strokeStyle = '#EFF4FF';
+                    ctx.lineWidth = 1.5;
+
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
+
+                    // Out of bounds check
+                    if (s.y < -30) {
+                        sheep.splice(i, 1);
+                    }
+                }
+
+                // HUD Stats
+                ctx.fillStyle = '#EFF4FF';
+                ctx.font = '8px ui-monospace, monospace';
+                ctx.fillText(`Score: ${score}`, 15, 20);
+                ctx.fillText(`Sleep Gained: +${sleepRestored.toFixed(1)}h`, 15, 32);
+                ctx.fillText(`Stress Relieved: -${stressReduced}%`, 15, 44);
+
+                canvas.gameResults = { s: sleepRestored, st: -stressReduced, w: 0, a: 0 };
+
+                gameLoopId = requestAnimationFrame(update);
+            }
+
+            update();
+        }
+
+        function endMiniGame(complete) {
+            if (gameTimerId) clearInterval(gameTimerId);
+            if (gameLoopId) cancelAnimationFrame(gameLoopId);
+
+            const canvas = document.getElementById('canvas-minigame');
+            const res = canvas.gameResults || { a: 0, s: 0, w: 0, st: 0 };
+
+            // Apply results to game variables
+            gameState.assignmentLoad = Math.max(0, Math.min(100, gameState.assignmentLoad + res.a));
+            gameState.sleepHours = Math.max(0, Math.min(12, gameState.sleepHours + res.s));
+            gameState.walletBalance = Math.max(0, Math.min(100, gameState.walletBalance + res.w));
+            gameState.stressLevel = Math.max(0, Math.min(100, gameState.stressLevel + res.st));
+
+            syncSlidersWithState();
+            runFuzzyInference();
+
+            // Display result panel inside Modal
+            document.getElementById('game-play-area').classList.add('hidden');
+            const listGrid = document.getElementById('games-list-grid');
+            listGrid.classList.remove('hidden');
+
+            // Pause game video
+            const videoBg = document.getElementById('game-video-bg');
+            if (videoBg) videoBg.pause();
+
+            // Reset viewport video back to general hub ambient loop
+            const viewVid = document.getElementById('minigames-viewport-video');
+            if (viewVid) {
+                viewVid.src = "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_053923_22c0a6a5-313c-474c-85ff-3b50d25e944a.mp4";
+                viewVid.play().catch(err => console.log("Video play failed:", err));
+            }
+
+            // Simple visual alert box on dashboard
+            alert(`Mini Game Complete!\n\nRewards Claimed:\nWorkload: ${res.a}%\nSleep: +${res.s}h\nWallet: +RM${res.w}\nStress: ${res.st}%`);
+            
+            currentGame = null;
+        }
+
+        function abortMiniGame() {
+            if (gameTimerId) clearInterval(gameTimerId);
+            if (gameLoopId) cancelAnimationFrame(gameLoopId);
+            
+            const videoBg = document.getElementById('game-video-bg');
+            if (videoBg) videoBg.pause();
+            
+            // Reset viewport video back to general hub ambient loop
+            const viewVid = document.getElementById('minigames-viewport-video');
+            if (viewVid) {
+                viewVid.src = "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_053923_22c0a6a5-313c-474c-85ff-3b50d25e944a.mp4";
+                viewVid.play().catch(err => console.log("Video play failed:", err));
+            }
+
+            currentGame = null;
+            document.getElementById('game-play-area').classList.add('hidden');
+            document.getElementById('games-list-grid').classList.remove('hidden');
+        }
+
+        function setupSlider(sliderId, valueId, stateProp, max, isFloat = false) {
+            const slider = document.getElementById(sliderId);
+            const display = document.getElementById(valueId);
+
+            slider.oninput = function() {
+                const val = isFloat ? parseFloat(this.value) : parseInt(this.value);
+                display.innerText = val.toFixed(isFloat ? 1 : 1);
+                gameState[stateProp] = val;
+                runFuzzyInference();
+            };
+        }
+
+        function makeChoice(choiceNum) {
+            const currentStage = timelineStages[gameState.stage];
+            const choice = choiceNum === 1 ? currentStage.c1 : currentStage.c2;
+
+            // Trigger dynamic roommate live commentary via local server proxy
+            generateCompanionReaction(currentStage, choice.name);
+
+            gameState.assignmentLoad = Math.max(0, Math.min(100, gameState.assignmentLoad + choice.a));
+            gameState.sleepHours = Math.max(0, Math.min(12, gameState.sleepHours + choice.s));
+            gameState.walletBalance = Math.max(0, Math.min(100, gameState.walletBalance + choice.w));
+            gameState.stressLevel = Math.max(0, Math.min(100, gameState.stressLevel + choice.st));
+
+            const currentIndex = stageOrder.indexOf(gameState.stage);
+            if (currentIndex < stageOrder.length - 1) {
+                gameState.stage = stageOrder[currentIndex + 1];
+                updateGameEventUI();
+            } else {
+                document.getElementById('event-title').innerText = "Semester Ended! [COMPLETED]";
+                document.getElementById('event-text').innerText = "Your final survival score has been computed by the fuzzy logic controller.";
+                document.getElementById('choice-card').innerHTML = `
+                    <div class="text-center p-4 bg-[#010828]/40 rounded-[20px] border border-neon/20">
+                        <p class="text-sm font-grotesk text-neon tracking-wider uppercase font-grotesk">Congratulations!</p>
+                        <p class="text-xs text-cream/70 mt-1 leading-relaxed font-mono-custom">Review your aggregate and defuzzification reports to the right.</p>
+                        <button onclick="resetGame()" class="mt-4 w-full py-2.5 bg-white text-black font-grotesk text-xs uppercase tracking-wider rounded-xl transition hover:bg-neon">
+                            Replay Semester
+                        </button>
+                    </div>
+                `;
+            }
+
+            syncSlidersWithState();
+            runFuzzyInference();
+        }
+
+        function syncSlidersWithState() {
+            document.getElementById('slider-assignment').value = gameState.assignmentLoad;
+            document.getElementById('val-assignment').innerText = gameState.assignmentLoad.toFixed(1);
+
+            document.getElementById('slider-sleep').value = gameState.sleepHours;
+            document.getElementById('val-sleep').innerText = gameState.sleepHours.toFixed(1);
+
+            document.getElementById('slider-wallet').value = gameState.walletBalance;
+            document.getElementById('val-wallet').innerText = gameState.walletBalance.toFixed(1);
+
+            document.getElementById('slider-stress').value = gameState.stressLevel;
+            document.getElementById('val-stress').innerText = gameState.stressLevel.toFixed(1);
+        }
+
+        function updateGameEventUI() {
+            const stage = gameState.stage;
+            const data = timelineStages[stage];
+
+            document.getElementById('stage-badge').innerText = stage;
+            document.getElementById('timeline-progress').style.width = data.progress + "%";
+
+            document.getElementById('choice-card').innerHTML = `
+                <h3 id="event-title" class="text-sm font-grotesk text-neon tracking-wide uppercase font-grotesk"></h3>
+                <p id="event-text" class="text-xs text-cream/60 leading-relaxed font-mono-custom"></p>
+                <div class="grid grid-cols-2 gap-3 pt-2" id="choice-buttons-row">
+                    <button id="choice-1-btn" onclick="makeChoice(1)" class="choice-btn px-4 py-2.5 text-xs font-grotesk rounded-xl text-cream hover:bg-neon hover:text-black uppercase"></button>
+                    <button id="choice-2-btn" onclick="makeChoice(2)" class="choice-btn px-4 py-2.5 text-xs font-grotesk rounded-xl text-cream/60 hover:bg-neon hover:text-black uppercase"></button>
+                </div>
+            `;
+
+            document.getElementById('event-title').innerText = data.title;
+            document.getElementById('event-text').innerText = data.text;
+            document.getElementById('choice-1-btn').innerText = data.c1.name;
+            document.getElementById('choice-2-btn').innerText = data.c2.name;
+        }
+
+        function resetGame() {
+            gameState = {
+                assignmentLoad: 40,
+                sleepHours: 7.0,
+                walletBalance: 80,
+                stressLevel: 30,
+                stage: 'Week 1'
+            };
+
+            syncSlidersWithState();
+            updateGameEventUI();
+            runFuzzyInference();
+        }
+
+        function runFuzzyInference() {
+            const results = window.FuzzyEngine.evaluate(gameState);
+
+            document.getElementById('centroid-display').innerText = results.score.toFixed(2);
+            document.getElementById('status-badge').innerText = results.status;
+
+            const dialogue = document.getElementById('dialogue-box');
+            
+            // Only overwrite dialogue if not waiting for Gen-Z AI commentary response
+            if (!dialogue.innerHTML.includes('Companion is typing...')) {
+                if (results.status === 'Thriving') {
+                    dialogue.innerText = '"Easiest semester of my life, chat."';
+                } else if (results.status === 'Hanging In There') {
+                    dialogue.innerText = '"We are surviving, barely."';
+                } else if (results.status === 'Cooked') {
+                    dialogue.innerText = '"Matcha latte bought. Wallet damage received."';
+                } else if (results.status === 'Deep Fried') {
+                    dialogue.innerText = '"I definitely have enough time to do this tomorrow... (coping)"';
+                } else {
+                    dialogue.innerText = '"Chat, I don\'t think I\'m making it."';
+                }
+            }
+
+            const rulesBox = document.getElementById('rules-box');
+            rulesBox.innerHTML = results.activeRules.map(r => {
+                return `
+                    <div class="flex justify-between items-center p-2.5 rounded-xl bg-[#010828]/40 border border-white/10">
+                        <span class="truncate pr-3 text-cream/80 font-semibold">${r.text}</span>
+                        <span class="px-2 py-0.5 rounded bg-neon/20 text-neon font-bold text-[9px] border border-neon/30">${r.strength.toFixed(2)}</span>
+                    </div>
+                `;
+            }).join('') || '<p class="text-cream/40 italic">No rules active</p>';
+
+            const MF = window.FuzzyEngine.MF;
+            drawMembershipChart('canvas-assignment', MF.assignmentLoad, gameState.assignmentLoad, 100);
+            drawMembershipChart('canvas-sleep', MF.sleepHours, gameState.sleepHours, 12, true);
+            drawMembershipChart('canvas-wallet', MF.walletBalance, gameState.walletBalance, 100);
+            drawMembershipChart('canvas-stress', MF.stressLevel, gameState.stressLevel, 100);
+            drawDefuzzificationChart('canvas-defuzz', results.aggregatedOutput, results.score);
+
+            // Update Dynamic Student Audit Modal Section
+            if (document.getElementById('audit-workload')) {
+                document.getElementById('audit-workload').innerText = gameState.assignmentLoad.toFixed(1) + "%";
+                document.getElementById('audit-sleep').innerText = gameState.sleepHours.toFixed(1) + "h";
+                document.getElementById('audit-wallet').innerText = "RM" + gameState.walletBalance.toFixed(1);
+                document.getElementById('audit-stress').innerText = gameState.stressLevel.toFixed(1) + "%";
+                document.getElementById('audit-status').innerText = results.status.toUpperCase();
+                document.getElementById('audit-score').innerText = results.score.toFixed(2);
+
+                // Determine Audit Recommendations (Simulating real-time FLC / LLM advisory report)
+                const recsBox = document.getElementById('audit-recommendations');
+                const recs = [];
+
+                if (gameState.sleepHours < 4) {
+                    recs.push(`
+                        <div class="p-2.5 bg-red-950/40 border border-red-500/30 rounded-lg flex items-start gap-2">
+                            <i class="fa-solid fa-triangle-exclamation text-red-500 mt-0.5"></i>
+                            <div>
+                                <strong class="text-red-400 block text-[10px] uppercase font-bold">Sleep Deprivation (Zombie State)</strong>
+                                <span class="text-cream/80 text-[11px]">FLC shows high sensitivity to zombie sleep inputs. Immediately launch the <span class="text-neon font-semibold">Sleep Sheep</span> mini-game or skip extracurriculars to restore sleep hours above 5.0h.</span>
+                            </div>
+                        </div>
+                    `);
+                } else if (gameState.sleepHours < 7) {
+                    recs.push(`
+                        <div class="p-2.5 bg-yellow-950/40 border border-yellow-500/30 rounded-lg flex items-start gap-2">
+                            <i class="fa-solid fa-circle-info text-yellow-500 mt-0.5 font-bold"></i>
+                            <div>
+                                <strong class="text-yellow-400 block text-[10px] uppercase font-bold">Sub-optimal Sleep Detected</strong>
+                                <span class="text-cream/80 text-[11px]">You are in the "Functioning" sleep band. A slight drop in other parameters could trigger an FLC status downgrade. Keep it stable.</span>
+                            </div>
+                        </div>
+                    `);
+                }
+
+                if (gameState.stressLevel > 75) {
+                    recs.push(`
+                        <div class="p-2.5 bg-red-950/40 border border-red-500/30 rounded-lg flex items-start gap-2">
+                            <i class="fa-solid fa-triangle-exclamation text-red-500 mt-0.5"></i>
+                            <div>
+                                <strong class="text-red-400 block text-[10px] uppercase font-bold">Burnout Alert (Stress Screaming)</strong>
+                                <span class="text-cream/80 text-[11px]">Stress level is in the "Screaming" band. This triggers rules that heavily clip your survival outputs. Go watch mamak futsal or use <span class="text-neon font-semibold">Sleep Sheep</span> to drop stress.</span>
+                            </div>
+                        </div>
+                    `);
+                } else if (gameState.stressLevel > 50) {
+                    recs.push(`
+                        <div class="p-2.5 bg-yellow-950/40 border border-yellow-500/30 rounded-lg flex items-start gap-2">
+                            <i class="fa-solid fa-circle-info text-yellow-500 mt-0.5 font-bold"></i>
+                            <div>
+                                <strong class="text-yellow-400 block text-[10px] uppercase font-bold">Elevated Stress</strong>
+                                <span class="text-cream/80 text-[11px]">Stress is "Concerned". It is actively dragging down your membership function curves in the final union set. Be cautious.</span>
+                            </div>
+                        </div>
+                    `);
+                }
+
+                if (gameState.walletBalance < 30) {
+                    recs.push(`
+                        <div class="p-2.5 bg-red-950/40 border border-red-500/30 rounded-lg flex items-start gap-2">
+                            <i class="fa-solid fa-triangle-exclamation text-red-500 mt-0.5"></i>
+                            <div>
+                                <strong class="text-red-400 block text-[10px] uppercase font-bold">Financial Crisis (Broke)</strong>
+                                <span class="text-cream/80 text-[11px]">Broke status restricts your coping choices and exacerbates stress. Play <span class="text-neon font-semibold">Maggi Chef</span> to quickly replenish funds (Wallet +RM4 per caught food orb).</span>
+                            </div>
+                        </div>
+                    `);
+                }
+
+                if (gameState.assignmentLoad > 75) {
+                    recs.push(`
+                        <div class="p-2.5 bg-red-950/40 border border-red-500/30 rounded-lg flex items-start gap-2">
+                            <i class="fa-solid fa-triangle-exclamation text-red-500 mt-0.5"></i>
+                            <div>
+                                <strong class="text-red-400 block text-[10px] uppercase font-bold">Academic Overload</strong>
+                                <span class="text-cream/80 text-[11px]">Workload is "Overloaded". This creates rules firing "Academic Victim" or "Deep Fried" outputs. Immediately type words in the <span class="text-neon font-semibold">Finals Crammer</span> game to shave down assignments.</span>
+                            </div>
+                        </div>
+                    `);
+                }
+
+                if (results.score >= 80) {
+                    recs.push(`
+                        <div class="p-2.5 bg-neon/10 border border-neon/30 rounded-lg flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-neon mt-0.5 font-bold"></i>
+                            <div>
+                                <strong class="text-neon block text-[10px] uppercase font-bold">System Status: Balanced & Thriving</strong>
+                                <span class="text-cream/80 text-[11px]">Excellent balance! FLC Centroid is sitting at a healthy ${results.score.toFixed(2)}. Your current state triggers rule unions leading to "Thriving". Keep it up!</span>
+                            </div>
+                        </div>
+                    `);
+                } else if (recs.length === 0) {
+                    recs.push(`
+                        <div class="p-2.5 bg-blue-950/40 border border-blue-500/30 rounded-lg flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-blue-400 mt-0.5 font-bold"></i>
+                            <div>
+                                <strong class="text-blue-400 block text-[10px] uppercase font-bold">Fuzzy Balance Maintained</strong>
+                                <span class="text-cream/80 text-[11px]">No critical alerts. All parameters reside within functioning fuzzy margins. FLC score is stable. Keep monitoring weekly choices.</span>
+                            </div>
+                        </div>
+                    `);
+                }
+
+                recsBox.innerHTML = recs.join('');
+            }
+        }
+
+        // DESIGN INTEGRATION DRAWING ENGINE - FIXED LINE STROKE COLORS
+        function drawMembershipChart(canvasId, sets, value, maxDomain, isFloat = false) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas || canvas.clientWidth === 0) return;
+            
+            const ctx = canvas.getContext('2d');
+            const w = canvas.clientWidth;
+            const h = canvas.clientHeight;
+            canvas.width = w * window.devicePixelRatio;
+            canvas.height = h * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+            ctx.clearRect(0, 0, w, h);
+
+            // Uniform margins mapping out perfect alignment for axes and values
+            const margin = { l: 28, r: 12, t: 16, b: 22 };
+            const mX = x => margin.l + (x / maxDomain) * (w - margin.l - margin.r);
+            const mY = y => h - margin.b - y * (h - margin.t - margin.b);
+
+            // Draw Y-Axis Line
+            ctx.strokeStyle = 'rgba(239, 244, 255, 0.15)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(margin.l, margin.t);
+            ctx.lineTo(margin.l, h - margin.b);
+            ctx.stroke();
+
+            // Draw Y-Axis DOM (0.0 to 1.0) Labels & Ticks
+            ctx.fillStyle = 'rgba(239, 244, 255, 0.6)';
+            ctx.font = '8px ui-monospace, monospace';
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'middle';
+            const yTicks = [0.0, 0.5, 1.0];
+            for (const tick of yTicks) {
+                const yPos = mY(tick);
+                ctx.fillText(tick.toFixed(1), margin.l - 6, yPos);
+                ctx.beginPath();
+                ctx.moveTo(margin.l - 3, yPos);
+                ctx.lineTo(margin.l, yPos);
+                ctx.stroke();
+            }
+
+            // Draw X-Axis Line
+            ctx.beginPath();
+            ctx.moveTo(margin.l, h - margin.b);
+            ctx.lineTo(w - margin.r, h - margin.b);
+            ctx.stroke();
+
+            // Draw X-Axis Universe of Discourse Labels & Ticks
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            const xTicks = [0, maxDomain / 2, maxDomain];
+            for (const tick of xTicks) {
+                const xPos = mX(tick);
+                ctx.fillText(isFloat ? tick.toFixed(1) : Math.round(tick).toString(), xPos, h - margin.b + 6);
+                ctx.beginPath();
+                ctx.moveTo(xPos, h - margin.b);
+                ctx.lineTo(xPos, h - margin.b + 3);
+                ctx.stroke();
+            }
+
+            // Set shapes (curves for the reference sets)
+            const colors = ['#8d4beb', '#3b82f6', '#6FFF00'];
+            let idx = 0;
+            for (const key in sets) {
+                const p = sets[key];
+                const color = colors[idx % colors.length];
+
+                ctx.beginPath();
+                ctx.moveTo(mX(p[0]), mY(0));
+                ctx.lineTo(mX(p[1]), mY(1));
+                if (p.length === 4) ctx.lineTo(mX(p[2]), mY(1));
+                ctx.lineTo(mX(p[p.length - 1]), mY(0));
+
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+
+                ctx.fillStyle = color + '15'; // 10% translucent fill
+                ctx.fill();
+                idx++;
+            }
+
+            // Draw Linguistic Labels inside the curves
+            let sIdx = 0;
+            for (const key in sets) {
+                const p = sets[key];
+                const color = colors[sIdx % colors.length];
+                const peakCenter = p.length === 4 ? (p[1] + p[2]) / 2 : p[1];
+                let labelX = mX(peakCenter);
+                
+                // Adjust edge labels for perfect visibility
+                if (sIdx === 0 && peakCenter === 0) labelX = mX(maxDomain * 0.1);
+                if (sIdx === 2 && peakCenter === maxDomain) labelX = mX(maxDomain * 0.9);
+
+                ctx.fillStyle = color;
+                ctx.font = 'bold 7px ui-monospace, monospace';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(key.toUpperCase(), labelX, mY(0.78));
+                sIdx++;
+            }
+
+            // Draw current active vertical line with neon pink glow
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = '#FF2E93';
+            ctx.beginPath();
+            ctx.moveTo(mX(value), margin.t);
+            ctx.lineTo(mX(value), h - margin.b);
+            ctx.strokeStyle = '#FF2E93';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            // Draw current value label at the top in neon pink
+            ctx.fillStyle = '#FF2E93';
+            ctx.font = 'bold 8px ui-monospace, monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText(value.toFixed(isFloat ? 1 : 0), mX(value), margin.t - 3);
+            ctx.textAlign = 'left'; // reset text align
+        }
+
+        function drawDefuzzificationChart(canvasId, curve, centroid) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas || canvas.clientWidth === 0) return;
+            
+            const ctx = canvas.getContext('2d');
+            const w = canvas.clientWidth;
+            const h = canvas.clientHeight;
+            canvas.width = w * window.devicePixelRatio;
+            canvas.height = h * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+            ctx.clearRect(0, 0, w, h);
+
+            const margin = { l: 28, r: 12, t: 18, b: 22 };
+            const mX = x => margin.l + (x / 100) * (w - margin.l - margin.r);
+            const mY = y => h - margin.b - y * (h - margin.t - margin.b);
+
+            // Draw Y-Axis Line
+            ctx.strokeStyle = 'rgba(239, 244, 255, 0.15)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(margin.l, margin.t);
+            ctx.lineTo(margin.l, h - margin.b);
+            ctx.stroke();
+
+            // Draw Y-Axis DOM (0.0 to 1.0) Labels & Ticks
+            ctx.fillStyle = 'rgba(239, 244, 255, 0.6)';
+            ctx.font = '8px ui-monospace, monospace';
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'middle';
+            const yTicks = [0.0, 0.5, 1.0];
+            for (const tick of yTicks) {
+                const yPos = mY(tick);
+                ctx.fillText(tick.toFixed(1), margin.l - 6, yPos);
+                ctx.beginPath();
+                ctx.moveTo(margin.l - 3, yPos);
+                ctx.lineTo(margin.l, yPos);
+                ctx.stroke();
+            }
+
+            // Draw X-Axis Line
+            ctx.beginPath();
+            ctx.moveTo(margin.l, h - margin.b);
+            ctx.lineTo(w - margin.r, h - margin.b);
+            ctx.stroke();
+
+            // Draw X-Axis Universe of Discourse Labels & Ticks
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            const xTicks = [0, 25, 50, 75, 100];
+            for (const tick of xTicks) {
+                const xPos = mX(tick);
+                ctx.fillText(tick.toString(), xPos, h - margin.b + 6);
+                ctx.beginPath();
+                ctx.moveTo(xPos, h - margin.b);
+                ctx.lineTo(xPos, h - margin.b + 3);
+                ctx.stroke();
+            }
+
+            // Draw Aggregate Union Shape
+            ctx.beginPath();
+            ctx.moveTo(mX(0), mY(0));
+            for (let i = 0; i <= 100; i++) {
+                ctx.lineTo(mX(i), mY(curve[i]));
+            }
+            ctx.lineTo(mX(100), mY(0));
+            ctx.closePath();
+
+            const grad = ctx.createLinearGradient(margin.l, 0, w - margin.r, 0);
+            grad.addColorStop(0, 'rgba(141, 75, 235, 0.25)');   // Purple
+            grad.addColorStop(0.5, 'rgba(59, 130, 246, 0.25)'); // Blue
+            grad.addColorStop(1, 'rgba(111, 255, 0, 0.25)');   // Neon Green
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            // Aggregation border line with neon green glow
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = '#6FFF00';
+            ctx.strokeStyle = '#6FFF00';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            // Draw Output Linguistic Labels at their representative locations
+            const outputLabels = [
+                { text: 'VICTIM', x: 8, color: '#8d4beb' },
+                { text: 'DEEP FRIED', x: 37, color: '#a24beb' },
+                { text: 'COOKED', x: 60, color: '#3b82f6' },
+                { text: 'HANGING', x: 80, color: '#4ba2eb' },
+                { text: 'THRIVING', x: 93, color: '#6FFF00' }
+            ];
+
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.font = 'bold 7px ui-monospace, monospace';
+            for (const lbl of outputLabels) {
+                ctx.fillStyle = lbl.color;
+                ctx.fillText(lbl.text, mX(lbl.x), margin.t + 6);
+            }
+
+            // Draw Centroid Dashed Line in Pink with neon pink glow
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#FF2E93';
+            ctx.beginPath();
+            ctx.moveTo(mX(centroid), margin.t);
+            ctx.lineTo(mX(centroid), h - margin.b);
+            ctx.strokeStyle = '#FF2E93';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([4, 4]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.shadowBlur = 0;
+
+            // Centroid marker dot (Pink)
+            ctx.beginPath();
+            ctx.arc(mX(centroid), mY(curve[Math.round(centroid)] || 0), 4.5, 0, Math.PI * 2);
+            ctx.fillStyle = '#FF2E93';
+            ctx.fill();
+            ctx.strokeStyle = '#EFF4FF';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            // Centroid text value label (Pink)
+            ctx.fillStyle = '#FF2E93';
+            ctx.font = 'bold 9px ui-monospace, monospace';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(`Centroid: ${centroid.toFixed(2)}`, mX(centroid) + 8, margin.t + 4);
+        }
+
+        // LOCAL BACKEND SERVER API CONNECTORS FOR GEMINI PERSONALITIES
+        async function callServerApi(endpoint, payload) {
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                if (data.error) {
+                    return { error: data.error };
+                }
+                return { text: data.text };
+            } catch (e) {
+                console.error("Failed to connect to local server:", e);
+                return null;
+            }
+        }
+
+        async function generateMotherAdvice() {
+            const advBox = document.getElementById('mother-advice-box');
+            advBox.classList.remove('hidden');
+            advBox.innerHTML = `
+                <div class="flex items-center gap-2 text-pink-500 text-[10px] uppercase font-bold animate-pulse font-mono-custom">
+                    <i class="fa-solid fa-spinner animate-spin mr-1"></i> Calling Mum on WhatsApp...
+                </div>
+            `;
+
+            const statsPrompt = `
+                Current Week: ${gameState.stage}
+                Assignment Workload: ${gameState.assignmentLoad.toFixed(1)}%
+                Sleep Hours: ${gameState.sleepHours.toFixed(1)}h
+                Wallet Balance: RM${gameState.walletBalance.toFixed(1)}
+                Stress Level: ${gameState.stressLevel.toFixed(1)}%
+                Current Fuzzy survival state: ${document.getElementById('audit-status').innerText}
+                Current Centroid Survival Score: ${document.getElementById('audit-score').innerText}/100
+            `;
+
+            const result = await callServerApi('/api/mum-advice', { prompt: statsPrompt });
+            
+            if (result && result.text) {
+                advBox.innerHTML = `
+                    <div class="flex items-start gap-2.5">
+                        <i class="fa-solid fa-comments text-pink-400 mt-0.5 text-xs"></i>
+                        <div>
+                            <strong class="text-pink-400 block text-[9px] uppercase font-bold tracking-wider">Mum's WhatsApp Voice:</strong>
+                            <span class="text-cream/90 text-[11px] leading-relaxed italic">"${result.text.replace(/"/g, '').trim()}"</span>
+                        </div>
+                    </div>
+                `;
+            } else if (result && result.error) {
+                advBox.innerHTML = `
+                    <div class="text-red-400 text-[10px] uppercase font-bold font-mono-custom">
+                        <i class="fa-solid fa-triangle-exclamation mr-1"></i> Mum is busy:
+                        <span class="block mt-1 font-normal text-cream/70 lowercase">${result.error}</span>
+                    </div>
+                `;
+            } else {
+                advBox.innerHTML = `
+                    <div class="text-red-400 text-[10px] uppercase font-bold font-mono-custom">
+                        <i class="fa-solid fa-triangle-exclamation mr-1"></i> Mum is busy:
+                        <span class="block mt-1 font-normal text-cream/70 lowercase">Local server is down. Make sure you run 'node server.js' in terminal!</span>
+                    </div>
+                `;
+            }
+        }
+
+        async function generateCompanionReaction(stageData, choiceName) {
+            const dialogue = document.getElementById('dialogue-box');
+            dialogue.innerHTML = `<span class="text-pink-400 animate-pulse font-mono-custom"><i class="fa-solid fa-circle-notch animate-spin mr-1"></i> Roomie is typing...</span>`;
+
+            const prompt = `
+                Weekly Event: "${stageData.title}"
+                Event description: "${stageData.text}"
+                Choice made by user: "${choiceName}"
+                Current Student Stats: Workload=${gameState.assignmentLoad.toFixed(1)}%, Sleep=${gameState.sleepHours.toFixed(1)}h, Wallet=RM${gameState.walletBalance.toFixed(1)}, Stress=${gameState.stressLevel.toFixed(1)}%
+                Current Fuzzy Survival Status: ${document.getElementById('status-badge').innerText}
+            `;
+
+            const result = await callServerApi('/api/companion-reaction', { prompt: prompt });
+            
+            if (result && result.text) {
+                dialogue.innerText = `"${result.text.replace(/"/g, '').trim()}"`;
+            } else {
+                // Fail fallback to local status reactions
+                const results = window.FuzzyEngine.evaluate(gameState);
+                if (results.status === 'Thriving') {
+                    dialogue.innerText = '"Easiest semester of my life, chat."';
+                } else if (results.status === 'Hanging In There') {
+                    dialogue.innerText = '"We are surviving, barely."';
+                } else if (results.status === 'Cooked') {
+                    dialogue.innerText = '"Matcha latte bought. Wallet damage received."';
+                } else if (results.status === 'Deep Fried') {
+                    dialogue.innerText = '"I definitely have enough time to do this tomorrow... (coping)"';
+                } else {
+                    dialogue.innerText = '"Chat, I don\'t think I\'m making it."';
+                }
+            }
+        }
+
+        window.onload = init;
+        // Redraw graphs when browser window resizes to match clientWidth
+        window.addEventListener('resize', runFuzzyInference);
+    </script>
+</body>
+</html>
