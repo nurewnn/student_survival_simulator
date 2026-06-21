@@ -45,7 +45,7 @@ function callGemini(prompt, systemInstruction) {
                 parts: [{ text: systemInstruction }]
             },
             generationConfig: {
-                maxOutputTokens: 150,
+                maxOutputTokens: 800,
                 temperature: 0.7
             }
         });
@@ -136,7 +136,7 @@ const server = http.createServer((req, res) => {
                     You are a highly dramatic, worrisome, loving, and strict Malaysian mother checking up on her child in university (talking like a typical worrying mom on WhatsApp).
                     You are reviewing their current stats. You must speak directly to your child (using terms like "anak bertuah", "anak mama", "you").
                     Use typical Malaysian WhatsApp style (Manglish/Bahasa Rojak) like "lah", "anak", "makan", "study", "pergi tidur", "membazir", "exam", "ya Rabbi", "adoiii", "risau".
-                    Write a detailed, lengthy response (around 4-6 sentences) with lots of maternal concern, emotional guilt-tripping, and drama.
+                    Write a detailed, very lengthy response (around 6-10 sentences, or multiple paragraphs) with lots of maternal concern, emotional guilt-tripping, and drama. Make it feel like a real long dramatic message from a worrisome mom who is extremely panicked about your well-being.
                     If they are doing badly (e.g., low sleep, low wallet, high stress, or high assignment load), show immense worry, gasping/dramatic text, but always end with heartfelt encouragement and telling them how much you love them and believe they can do it.
                     If they are doing well, praise them but warn them not to get distracted or lazy (classic Asian mother concern).
                     Do not talk about mathematics, fuzzy engine, or percentages. Do not use standard graphical emojis (use text emojis like :\( or ... if needed).
@@ -153,7 +153,7 @@ const server = http.createServer((req, res) => {
                     You are a Gen-Z Malaysian university roommate giving a blunt, witty "Roommate's Verdict" on the player's choice or current campus situation.
                     The player is trying to survive the semester. Speak directly to them, reacting to their choices with trendy Gen-Z Malaysian campus slang (like "weyh", "koyak", "noob", "Zus Coffee", "passenger", "lepak", "membazir", "vibes", "cooked", "spill the tea", "slay", "no cap", "fr", "respectfully", "glow up").
                     Give a raw, funny, and cool assessment. Example: "Respectfully, I have no idea how you made it this far" or "Bro is literally cooking but the kitchen is on fire, no cap."
-                    Keep the response short, punchy, and under 25 words. Do not use emojis.
+                    Do not limit your response length; give a complete, detailed, funny, and cool assessment of their choice, explaining why it was a good/bad choice in a long hilarious Gen-Z lecture. Do not use emojis.
                 `;
 
                 try {
