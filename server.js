@@ -5,81 +5,135 @@ const path = require('path');
 
 const PORT = 3000;
 
-// Load API Key from .env file
-let apiKey = '';
+// Load API Keys from .env file
+let geminiApiKey = '';
+let groqApiKey = '';
 const envPath = path.join(__dirname, '.env');
 try {
     if (fs.existsSync(envPath)) {
         const envContent = fs.readFileSync(envPath, 'utf8');
-        const match = envContent.match(/GEMINI_API_KEY\s*=\s*(.*)/);
-        if (match) {
-            apiKey = match[1].trim().replace(/['"]/g, '');
+        
+        const geminiMatch = envContent.match(/GEMINI_API_KEY\s*=\s*([^\r\n]*)/);
+        if (geminiMatch) {
+            geminiApiKey = geminiMatch[1].trim().replace(/['"]/g, '');
+        }
+        
+        const groqMatch = envContent.match(/GROQ_API_KEY\s*=\s*([^\r\n]*)/);
+        if (groqMatch) {
+            groqApiKey = groqMatch[1].trim().replace(/['"]/g, '');
         }
     }
 } catch (e) {
     console.error("Warning: Failed to read .env file:", e.message);
 }
 
-if (!apiKey || apiKey === 'YOUR_GEMINI_API_KEY_HERE') {
-    console.log("\n⚠️  WARNING: GEMINI_API_KEY is not configured in .env file.");
-    console.log("Please open .env and replace placeholder with your Gemini API Key from Google AI Studio.\n");
+// Log loaded API key status
+if (groqApiKey && groqApiKey !== 'YOUR_GROQ_API_KEY_HERE') {
+    console.log("✅ Groq API key loaded successfully. (Using Llama-3.3-70b-versatile)");
+} else if (geminiApiKey && geminiApiKey !== 'YOUR_GEMINI_API_KEY_HERE') {
+    console.log("✅ Google Gemini API key loaded successfully. (Using Gemini-2.5-Flash)");
 } else {
-    console.log("✅ Google Gemini API key loaded successfully.");
+    console.log("\n⚠️  WARNING: Neither GEMINI_API_KEY nor GROQ_API_KEY is configured in your .env file.");
+    console.log("Please add your key in the .env file to enable AI dialogue.\n");
 }
 
-// Helper to make Gemini API requests in the backend
+// Helper to make API requests to either Groq or Gemini based on loaded keys
 function callGemini(prompt, systemInstruction) {
     return new Promise((resolve, reject) => {
-        if (!apiKey || apiKey === 'YOUR_GEMINI_API_KEY_HERE') {
-            reject(new Error("API key is not configured in your .env file. Please add your key first."));
-            return;
-        }
-
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-        
-        const payload = JSON.stringify({
-            contents: [{
-                parts: [{ text: prompt }]
-            }],
-            systemInstruction: {
-                parts: [{ text: systemInstruction }]
-            },
-            generationConfig: {
-                maxOutputTokens: 800,
+        // 1. Prioritize Groq if Key exists
+        if (groqApiKey && groqApiKey !== 'YOUR_GROQ_API_KEY_HERE') {
+            const url = 'https://api.groq.com/openai/v1/chat/completions';
+            const payload = JSON.stringify({
+                model: 'llama-3.3-70b-versatile',
+                messages: [
+                    { role: 'system', content: systemInstruction },
+                    { role: 'user', content: prompt }
+                ],
+                max_tokens: 800,
                 temperature: 0.7
-            }
-        });
+            });
 
-        const req = https.request(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': Buffer.byteLength(payload)
-            }
-        }, (res) => {
-            let responseData = '';
-            res.on('data', chunk => responseData += chunk);
-            res.on('end', () => {
-                try {
-                    const parsed = JSON.parse(responseData);
-                    if (res.statusCode !== 200) {
-                        reject(new Error(parsed.error?.message || `HTTP ${res.statusCode} Error`));
-                        return;
+            const req = https.request(url, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${groqApiKey}`,
+                    'Content-Type': 'application/json',
+                    'Content-Length': Buffer.byteLength(payload)
+                }
+            }, (res) => {
+                let responseData = '';
+                res.on('data', chunk => responseData += chunk);
+                res.on('end', () => {
+                    try {
+                        const parsed = JSON.parse(responseData);
+                        if (res.statusCode !== 200) {
+                            reject(new Error(parsed.error?.message || `HTTP ${res.statusCode} Error`));
+                            return;
+                        }
+                        const text = parsed.choices?.[0]?.message?.content || '';
+                        resolve(text);
+                    } catch (e) {
+                        reject(new Error("Failed to parse Groq response: " + e.message));
                     }
-                    const text = parsed.candidates?.[0]?.content?.parts?.[0]?.text || '';
-                    resolve(text);
-                } catch (e) {
-                    reject(new Error("Failed to parse Gemini response: " + e.message));
+                });
+            });
+
+            req.on('error', (err) => {
+                reject(new Error("Network connection to Groq failed: " + err.message));
+            });
+
+            req.write(payload);
+            req.end();
+        }
+        // 2. Fallback to Gemini
+        else if (geminiApiKey && geminiApiKey !== 'YOUR_GEMINI_API_KEY_HERE') {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`;
+            const payload = JSON.stringify({
+                contents: [{
+                    parts: [{ text: prompt }]
+                }],
+                systemInstruction: {
+                    parts: [{ text: systemInstruction }]
+                },
+                generationConfig: {
+                    maxOutputTokens: 800,
+                    temperature: 0.7
                 }
             });
-        });
 
-        req.on('error', (err) => {
-            reject(new Error("Network connection to Gemini failed: " + err.message));
-        });
+            const req = https.request(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': Buffer.byteLength(payload)
+                }
+            }, (res) => {
+                let responseData = '';
+                res.on('data', chunk => responseData += chunk);
+                res.on('end', () => {
+                    try {
+                        const parsed = JSON.parse(responseData);
+                        if (res.statusCode !== 200) {
+                            reject(new Error(parsed.error?.message || `HTTP ${res.statusCode} Error`));
+                            return;
+                        }
+                        const text = parsed.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                        resolve(text);
+                    } catch (e) {
+                        reject(new Error("Failed to parse Gemini response: " + e.message));
+                    }
+                });
+            });
 
-        req.write(payload);
-        req.end();
+            req.on('error', (err) => {
+                reject(new Error("Network connection to Gemini failed: " + err.message));
+            });
+
+            req.write(payload);
+            req.end();
+        } else {
+            reject(new Error("No valid API key configured. Please add GEMINI_API_KEY or GROQ_API_KEY to your .env file."));
+        }
     });
 }
 
